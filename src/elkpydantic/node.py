@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import List, Union
+from typing import List, Union, Optional
 from pydantic import BaseModel, field_validator
 
 from .base import Properties
@@ -43,7 +43,7 @@ class NodeLabel(BaseModel):
 class Node(BaseModel):
     id: str
     type: str
-    icon: str
+    icon: Optional[str] = None
     width: float
     height: float
     labels: List[NodeLabel]
