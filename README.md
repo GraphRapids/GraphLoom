@@ -19,16 +19,16 @@ pip install -e .
 ## CLI usage
 ```bash
 # Using installed console script
-elkpydantic json/sample_input_01.json \
-  -s json/elk_settings.example.toml \
+elkpydantic examples/sample_input_01.json \
+  -s examples/elk_settings.example.toml \
   -o /tmp/elk.json
 
 # Or directly
-python -m elkpydantic.builder json/sample_input_01.json -s json/elk_settings.example.toml
+python -m elkpydantic.builder examples/sample_input_01.json -s examples/elk_settings.example.toml
 ```
 Flags:
-- `-i/--input` minimal graph JSON (default `json/sample_input_01.json`)
-- `-s/--settings` settings TOML/JSON (default `json/elk_settings.example.toml`; falls back to built-in sample if missing)
+- `-i/--input` minimal graph JSON (default `examples/sample_input_01.json`)
+- `-s/--settings` settings TOML/JSON (default `examples/elk_settings.example.toml`; falls back to built-in sample if missing)
 - `-o/--output` write to file (stdout if omitted)
 
 ## Library usage
@@ -50,7 +50,7 @@ elk_json = canvas.model_dump_json(indent=2, by_alias=True)
 Unknown nodes referenced in edges are auto-created when `auto_create_missing_nodes` is true (default).
 
 ## Settings (TOML/JSON or env)
-See `json/elk_settings.example.toml`
+See `examples/elk_settings.example.toml`
 - `layout_options`: ELK keys (flattened by builder) e.g. `org.eclipse.elk.algorithm`.
 - `node_defaults`: sizes, label defaults, port defaults, properties; `type="default"`, `icon=""` (None).
 - `edge_defaults`: label defaults and properties.
@@ -71,4 +71,4 @@ Default type is `default` with no icon; mapping wins when present, otherwise ove
 
 ## Development
 - Run tests: `. .venv/bin/activate && pytest -q`
-- Example run: `elkpydantic example/sample_input_01.json -s example/elk_settings.example.toml`
+- Example run: `elkpydantic examples/sample_input_01.json -s examples/elk_settings.example.toml`
