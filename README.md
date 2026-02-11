@@ -49,7 +49,8 @@ elk_json = canvas.model_dump_json(indent=2, by_alias=True)
 - **edges[]**: `{ "l": "<label>", "t": "<class>", "a": "Node:Port", "b": "Node:Port" }`
 Unknown nodes referenced in edges are auto-created when `auto_create_missing_nodes` is true (default).
 
-## Settings (TOML/JSON or env, see `json/elk_settings.example.toml`)
+## Settings (TOML/JSON or env)
+See `json/elk_settings.example.toml`
 - `layout_options`: ELK keys (flattened by builder) e.g. `org.eclipse.elk.algorithm`.
 - `node_defaults`: sizes, label defaults, port defaults, properties; `type="default"`, `icon=""` (None).
 - `edge_defaults`: label defaults and properties.
