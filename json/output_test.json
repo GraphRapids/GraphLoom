@@ -13,14 +13,14 @@
   },
   "children": [
     {
-      "id": "bgp_router_1",
+      "id": "bgp_1",
       "type": "router",
       "icon": "mdi:router",
       "width": 50.0,
       "height": 50.0,
       "labels": [
         {
-          "text": "BGP Router 1",
+          "text": "BGP-1",
           "width": 150.0,
           "height": 16.0,
           "properties": {
@@ -32,7 +32,7 @@
       ],
       "ports": [
         {
-          "id": "bgp_router_1_hu0_0_0_0",
+          "id": "bgp_1_hu0_0_0_0",
           "width": 2.0,
           "height": 2.0,
           "labels": [
@@ -55,7 +55,7 @@
           }
         },
         {
-          "id": "bgp_router_1_hu0_0_0_1",
+          "id": "bgp_1_hu0_0_0_1",
           "width": 2.0,
           "height": 2.0,
           "labels": [
@@ -89,14 +89,14 @@
       }
     },
     {
-      "id": "bgp_router_2",
+      "id": "bgp_2",
       "type": "router",
       "icon": "mdi:router",
       "width": 50.0,
       "height": 50.0,
       "labels": [
         {
-          "text": "BGP Router 2",
+          "text": "BGP-2",
           "width": 150.0,
           "height": 16.0,
           "properties": {
@@ -108,7 +108,7 @@
       ],
       "ports": [
         {
-          "id": "bgp_router_2_hu0_0_0_0",
+          "id": "bgp_2_hu0_0_0_0",
           "width": 2.0,
           "height": 2.0,
           "labels": [
@@ -131,7 +131,7 @@
           }
         },
         {
-          "id": "bgp_router_2_hu0_0_0_1",
+          "id": "bgp_2_hu0_0_0_1",
           "width": 2.0,
           "height": 2.0,
           "labels": [
@@ -163,16 +163,45 @@
           "placement": "[OUTSIDE, V_BOTTOM, H_CENTER, H_PRIORITY]"
         }
       }
+    },
+    {
+      "id": "unconnected_router",
+      "type": "router",
+      "icon": "mdi:router",
+      "width": 50.0,
+      "height": 50.0,
+      "labels": [
+        {
+          "text": "Unconnected router",
+          "width": 150.0,
+          "height": 16.0,
+          "properties": {
+            "font": {
+              "size": 16
+            }
+          }
+        }
+      ],
+      "ports": [],
+      "properties": {
+        "portConstraints": "[FIXED_ORDER]",
+        "portLabels": {
+          "placement": "[OUTSIDE, NEXT_TO_PORT_IF_POSSIBLE]"
+        },
+        "nodeLabels": {
+          "placement": "[OUTSIDE, V_BOTTOM, H_CENTER, H_PRIORITY]"
+        }
+      }
     }
   ],
   "edges": [
     {
       "id": "uplink_1",
       "sources": [
-        "bgp_router_1_hu0_0_0_0"
+        "bgp_1_hu0_0_0_0"
       ],
       "targets": [
-        "bgp_router_2_hu0_0_0_0"
+        "bgp_2_hu0_0_0_0"
       ],
       "labels": [
         {
@@ -199,10 +228,10 @@
     {
       "id": "uplink_2",
       "sources": [
-        "bgp_router_1_hu0_0_0_1"
+        "bgp_1_hu0_0_0_1"
       ],
       "targets": [
-        "bgp_router_2_hu0_0_0_1"
+        "bgp_2_hu0_0_0_1"
       ],
       "labels": [
         {

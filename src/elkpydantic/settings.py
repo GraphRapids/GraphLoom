@@ -84,9 +84,9 @@ def sample_settings() -> ElkSettings:
                     "height": 2.0,
                     "label": {
                         "text": "Port",
-                        "width": 100,
-                        "height": 8,
-                        "properties": {"font.size": 8},
+                        "width": 50,
+                        "height": 6,
+                        "properties": {"font.size": 6},
                     },
                     "properties": {"port.index": 0},
                 },
