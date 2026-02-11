@@ -236,6 +236,7 @@ def _load_settings(path: str | None) -> ElkSettings:
         raise ValueError("Unsupported settings format; use .toml or .json")
     if "layout_options" in data and isinstance(data["layout_options"], dict):
         data["layout_options"] = _flatten_layout(data["layout_options"])
+    data = _flatten_properties_blocks(data)
     return ElkSettings.model_validate(data)
 
 
@@ -249,6 +250,21 @@ def _flatten_layout(layout: Dict[str, Any], prefix: str = "") -> Dict[str, Any]:
         else:
             flat[new_key] = value
     return flat
+
+
+def _flatten_properties_blocks(config: Any) -> Any:
+    """Flatten any dict stored under a 'properties' key using dotted keys."""
+    if isinstance(config, dict):
+        flattened: Dict[str, Any] = {}
+        for key, value in config.items():
+            if key == "properties" and isinstance(value, dict):
+                flattened[key] = _flatten_layout(value)
+            else:
+                flattened[key] = _flatten_properties_blocks(value)
+        return flattened
+    if isinstance(config, list):
+        return [_flatten_properties_blocks(item) for item in config]
+    return config
 
 
 def main(argv: List[str] | None = None) -> int:

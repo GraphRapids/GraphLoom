@@ -98,3 +98,17 @@ def test_icon_mapping_case_insensitive():
     settings = sample_settings()
     canvas = build_canvas(minimal, settings)
     assert canvas.children[0].icon == "mdi:router"
+
+
+def test_toml_properties_are_flattened():
+    from elkpydantic.builder import _load_settings
+
+    settings = _load_settings("json/elk_settings.example.toml")
+
+    # dotted keys preserved instead of nested objects
+    assert settings.node_defaults.label.properties == {"font.size": 16}
+    assert settings.node_defaults.port.properties == {"port.index": 0}
+    assert settings.edge_defaults.label.properties == {
+        "font.size": 10,
+        "edgeLabels.inline": False,
+    }

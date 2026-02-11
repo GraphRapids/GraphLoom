@@ -11,7 +11,6 @@ from pathlib import Path
 from elkpydantic.builder import MinimalGraphIn, build_canvas, _load_settings
 from elkpydantic.settings import sample_settings
 
-
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Enrich minimal graph JSON into ELK JSON.")
     parser.add_argument(
@@ -29,6 +28,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "-o",
         "--output",
+        default="/Users/abo/Downloads/output.json",
         help="Where to write ELK JSON (default: stdout)",
     )
     args = parser.parse_args(argv)
