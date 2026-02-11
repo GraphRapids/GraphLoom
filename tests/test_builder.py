@@ -47,3 +47,14 @@ def test_icon_mapping():
     settings = sample_settings()
     canvas = build_canvas(minimal, settings)
     assert canvas.children[0].icon == "clarity:firewall-line"
+
+
+def test_default_icon_none():
+    minimal = MinimalGraphIn(
+        nodes=[{"l": "Node1"}],  # no type specified -> default
+        edges=[],
+    )
+    settings = sample_settings()
+    canvas = build_canvas(minimal, settings)
+    assert canvas.children[0].type == "default"
+    assert canvas.children[0].icon is None

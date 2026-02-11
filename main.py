@@ -29,6 +29,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "-o",
         "--output",
+        default="json/output_test.json",
         help="Where to write ELK JSON (default: stdout)",
     )
     args = parser.parse_args(argv)

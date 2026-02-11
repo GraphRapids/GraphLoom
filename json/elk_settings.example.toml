@@ -12,8 +12,8 @@ org.eclipse.elk.zoomToFit = true
 org.eclipse.elk.direction = "RIGHT"
 
 [node_defaults]
-type = "router"
-icon = "mdi:router"
+type = "default"
+icon = ""
 width = 50
 height = 50
 properties.portConstraints = "[FIXED_ORDER]"

@@ -20,7 +20,7 @@ class PortDefaults(BaseModel):
 
 class NodeDefaults(BaseModel):
     type: str
-    icon: str
+    icon: str | None = None
     width: float
     height: float
     label: LabelDefaults
@@ -69,8 +69,8 @@ def sample_settings() -> ElkSettings:
                 "org.eclipse.elk.direction": "RIGHT",
             },
             "node_defaults": {
-                "type": "router",
-                "icon": "mdi:router",
+                "type": "default",
+                "icon": None,
                 "width": 50,
                 "height": 50,
                 "label": {

@@ -126,9 +126,7 @@ def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> C
     canvas_children: List[Node] = []
     for node_rec in nodes:
         defaults = settings.type_overrides.get(node_rec.type) or settings.node_defaults
-        icon = defaults.icon
-        if node_rec.type in settings.type_icon_map:
-            icon = settings.type_icon_map[node_rec.type]
+        icon = settings.type_icon_map.get(node_rec.type, defaults.icon)
         node_ports: List[Port] = []
         for i, port_data in enumerate(ports.get(node_rec.id, OrderedDict()).values()):
             port_defaults = defaults.port
