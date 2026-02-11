@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "elkpydantic"
+version = "0.1.0"
+description = "Enriches minimal JSON input to valid ELK JSON output"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "pydantic>=2",
+    "pydantic-settings>=2",
+    "tomli>=2"
+]
+authors = [
+    { name = "Faerkeren" },
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+melk = [
+    "resources/*",
+]
+
+[project.scripts]
+elkpydantic = "elkpydantic.builder:main"

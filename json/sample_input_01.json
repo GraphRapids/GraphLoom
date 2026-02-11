@@ -1,0 +1,10 @@
+{
+    "nodes": [
+        { "l": "BGP Router 1", "t": "router" },
+        { "l": "BGP Router 2", "t": "router" }
+    ],
+    "edges": [
+        { "l": "Uplink 1", "t": "100G", "a": "BGP-1:Hu0/0/0/0", "b": "BGP-2:Hu0/0/0/0" },
+        { "l": "Uplink 2", "t": "100G", "a": "BGP-1:Hu0/0/0/1", "b": "BGP-2:Hu0/0/0/1" }
+    ]
+}

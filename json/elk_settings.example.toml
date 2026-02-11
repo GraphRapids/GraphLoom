@@ -1,0 +1,51 @@
+# Example defaults mirroring sample_output_01.json
+
+[layout_options]
+org.eclipse.elk.nodeLabels.placement = "[H_CENTER,V_BOTTOM,OUTSIDE,H_PRIORITY]"
+org.eclipse.elk.portLabels.placement = "[OUTSIDE]"
+org.eclipse.elk.algorithm = "layered"
+org.eclipse.elk.nodeSize.constraints = "MINIMUM_SIZE"
+org.eclipse.elk.nodeSize.options = "DEFAULT_MINIMUM_SIZE"
+org.eclipse.elk.layered.layering.strategy = "NETWORK_SIMPLEX"
+org.eclipse.elk.aspectRatio = "1.414"
+org.eclipse.elk.zoomToFit = true
+org.eclipse.elk.direction = "RIGHT"
+
+[node_defaults]
+type = "router"
+icon = "mdi:router"
+width = 50
+height = 50
+properties.portConstraints = "[FIXED_ORDER]"
+properties.portLabels.placement = "[OUTSIDE, NEXT_TO_PORT_IF_POSSIBLE]"
+properties.nodeLabels.placement = "[OUTSIDE, V_BOTTOM, H_CENTER, H_PRIORITY]"
+
+[node_defaults.label]
+text = "Node"
+width = 150
+height = 16
+properties.font.size = 16
+
+[node_defaults.port]
+width = 2.0
+height = 2.0
+properties.port.index = 0
+
+[node_defaults.port.label]
+text = "Port"
+width = 100
+height = 8
+properties.font.size = 8
+
+[edge_defaults]
+properties.edge.type = "UNDIRECTED"
+properties.edge.thickness = 1
+
+[edge_defaults.label]
+text = "Edge"
+width = 100
+height = 10
+properties.font.size = 10
+properties.edgeLabels.inline = false
+
+auto_create_missing_nodes = true

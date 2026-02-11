@@ -1,0 +1,186 @@
+{
+  "id": "canvas",
+  "layoutOptions": {
+    "org.eclipse.elk.nodeLabels.placement": "[H_CENTER,V_BOTTOM,OUTSIDE,H_PRIORITY]",
+    "org.eclipse.elk.portLabels.placement": "[OUTSIDE]",
+    "org.eclipse.elk.algorithm": "layered",
+    "org.eclipse.elk.nodeSize.constraints": "MINIMUM_SIZE",
+    "org.eclipse.elk.nodeSize.options": "DEFAULT_MINIMUM_SIZE",
+    "org.eclipse.elk.layered.layering.strategy": "NETWORK_SIMPLEX",
+    "org.eclipse.elk.aspectRatio": "1.414",
+    "org.eclipse.elk.zoomToFit": true,
+    "org.eclipse.elk.direction": "RIGHT"
+  },
+  "children": [
+    {
+      "id": "BGP_1",
+      "type": "router",
+      "icon": "mdi:router",
+      "width": 50,
+      "height": 50,
+      "labels": [
+        {
+          "text": "BGP 1",
+          "width": 150,
+          "height": 16,
+          "properties": {
+            "font.size": 16
+          }
+        }
+      ],
+      "ports": [
+        {
+          "id": "BGP_1_Hu0_0_0_0",
+          "width": 2.0,
+          "height": 2.0,
+          "labels": [
+            {
+              "text": "Hu0/0/0/0",
+              "width": 100,
+              "height": 8,
+              "properties": {
+                "font.size": 8
+              }
+            }
+          ],
+          "properties": {
+            "port.index": 0
+          }
+        },
+        {
+          "id": "BGP_1_Hu0_0_0_1",
+          "width": 2.0,
+          "height": 2.0,
+          "labels": [
+            {
+              "text": "Hu0/0/0/1",
+              "width": 100,
+              "height": 8,
+              "properties": {
+                "font.size": 8
+              }
+            }
+          ],
+          "properties": {
+            "port.index": 1
+          }
+        }
+      ],
+      "properties": {
+        "portConstraints": "[FIXED_ORDER]",
+        "portLabels.placement": "[OUTSIDE, NEXT_TO_PORT_IF_POSSIBLE]",
+        "nodeLabels.placement": "[OUTSIDE, V_BOTTOM, H_CENTER, H_PRIORITY]"
+      }
+    },
+    {
+      "id": "BGP_2",
+      "type": "router",
+      "icon": "mdi:router",
+      "width": 50,
+      "height": 50,
+      "labels": [
+        {
+          "text": "BGP 2",
+          "width": 150,
+          "height": 16,
+          "properties": {
+            "font.size": 16
+          }
+        }
+      ],
+      "ports": [
+        {
+          "id": "BGP_2_Hu0_0_0_0",
+          "width": 2.0,
+          "height": 2.0,
+          "labels": [
+            {
+              "text": "Hu0/0/0/0",
+              "width": 100,
+              "height": 8,
+              "properties": {
+                "font.size": 8
+              }
+            }
+          ],
+          "properties": {
+            "port.index": 0
+          }
+        },
+        {
+          "id": "BGP_2_Hu0_0_0_1",
+          "width": 2.0,
+          "height": 2.0,
+          "labels": [
+            {
+              "text": "Hu0/0/0/1",
+              "width": 100,
+              "height": 8,
+              "properties": {
+                "font.size": 8
+              }
+            }
+          ],
+          "properties": {
+            "port.index": 1
+          }
+        }
+      ],
+      "properties": {
+        "portConstraints": "[FIXED_ORDER]",
+        "portLabels.placement": "[OUTSIDE, NEXT_TO_PORT_IF_POSSIBLE]",
+        "nodeLabels.placement": "[OUTSIDE, V_BOTTOM, H_CENTER, H_PRIORITY]"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "Uplink_1",
+      "sources": [
+        "BGP_1_Hu0_0_0_0"
+      ],
+      "targets": [
+        "BGP_2_Hu0_0_0_0"
+      ],
+      "labels": [
+        {
+          "text": "Uplink 1",
+          "width": 100,
+          "height": 10,
+          "properties": {
+            "font.size": 10,
+            "edgeLabels.inline": false
+          }
+        }
+      ],
+      "properties": {
+        "edge.type": "UNDIRECTED",
+        "edge.thickness": 1
+      }
+    },
+    {
+      "id": "Uplink_2",
+      "sources": [
+        "BGP_1_Hu0_0_0_1"
+      ],
+      "targets": [
+        "BGP_2_Hu0_0_0_1"
+      ],
+      "labels": [
+        {
+          "text": "Uplink 2",
+          "width": 100,
+          "height": 10,
+          "properties": {
+            "font.size": 10,
+            "edgeLabels.inline": false
+          }
+        }
+      ],
+      "properties": {
+        "edge.type": "UNDIRECTED",
+        "edge.thickness": 1
+      }
+    }
+  ]
+}
