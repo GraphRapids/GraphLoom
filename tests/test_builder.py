@@ -16,20 +16,23 @@ def test_sample_build():
     canvas = build_canvas(data, settings)
 
     assert canvas.id == "canvas"
-    assert len(canvas.children) == 2
+    assert len(canvas.children) == 3  # includes unconnected router
 
     child_ids = [c.id for c in canvas.children]
     assert all(cid == cid.lower() for cid in child_ids)
 
     # Ports derived from edges
     for child in canvas.children:
-        assert len(child.ports) == 2
-        for idx, port in enumerate(child.ports):
-            assert port.properties.model_dump().get("port.index") == idx
+        if child.id.startswith("bgp_"):
+            assert len(child.ports) == 2
+            for idx, port in enumerate(child.ports):
+                assert port.properties.model_dump().get("port.index") == idx
+        else:
+            assert child.ports == []
 
     # Edge wiring
-    n1 = "bgp_router_1"
-    n2 = "bgp_router_2"
+    n1 = "bgp_1"
+    n2 = "bgp_2"
     assert canvas.edges[0].sources == [f"{n1}_hu0_0_0_0"]
     assert canvas.edges[0].targets == [f"{n2}_hu0_0_0_0"]
     assert canvas.edges[1].sources == [f"{n1}_hu0_0_0_1"]
@@ -85,3 +88,13 @@ def test_port_name_with_colons():
     # Port ids should include sanitized portion after first colon only
     assert canvas.edges[0].sources[0] == "router1_fo_1_0_0"
     assert canvas.edges[0].targets[0] == "router2_fo_2_0_0"
+
+
+def test_icon_mapping_case_insensitive():
+    minimal = MinimalGraphIn(
+        nodes=[{"l": "R1", "t": "Router"}],  # capitalized type
+        edges=[],
+    )
+    settings = sample_settings()
+    canvas = build_canvas(minimal, settings)
+    assert canvas.children[0].icon == "mdi:router"

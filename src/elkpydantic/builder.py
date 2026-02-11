@@ -41,7 +41,7 @@ class MinimalGraphIn(BaseModel):
 def sanitize_id(value: str) -> str:
     """Lowercase, replace non-alnum with underscores, collapse duplicates."""
     s = value.strip().lower()
-    s = re.sub(r"[\\s:/@-]+", "_", s)
+    s = re.sub(r"[\s:/@-]+", "_", s)
     s = re.sub(r"[^a-z0-9_]", "_", s)
     s = re.sub(r"_+", "_", s).strip("_")
     return s or "id"
@@ -49,7 +49,7 @@ def sanitize_id(value: str) -> str:
 
 def _candidate_aliases(label: str) -> List[str]:
     base = sanitize_id(label)
-    tokens = [t for t in re.split(r"[\\s_]+", base) if t]
+    tokens = [t for t in re.split(r"[\s_]+", base) if t]
     stop = {"router", "switch", "node", "host", "device"}
     filtered = [t for t in tokens if t not in stop]
     aliases = {base}
@@ -78,13 +78,16 @@ def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> C
     # 1) Prepare node records and alias index
     nodes: List[_NodeRecord] = []
     alias_index: Dict[str, str] = {}
+    type_overrides_lc = {k.lower(): v for k, v in settings.type_overrides.items()}
+    type_icon_map_lc = {k.lower(): v for k, v in settings.type_icon_map.items()}
 
     def register_node(label: str, node_type: str | None = None) -> _NodeRecord:
         node_id = sanitize_id(label)
+        node_type_norm = (node_type or settings.node_defaults.type).lower()
         record = _NodeRecord(
             id=node_id,
             label=label,
-            type=node_type or settings.node_defaults.type,
+            type=node_type_norm,
             aliases=_candidate_aliases(label),
         )
         nodes.append(record)
@@ -127,8 +130,8 @@ def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> C
     # 3) Build concrete nodes
     canvas_children: List[Node] = []
     for node_rec in nodes:
-        defaults = settings.type_overrides.get(node_rec.type) or settings.node_defaults
-        icon = settings.type_icon_map.get(node_rec.type, defaults.icon)
+        defaults = type_overrides_lc.get(node_rec.type) or settings.node_defaults
+        icon = type_icon_map_lc.get(node_rec.type, defaults.icon)
         node_ports: List[Port] = []
         for i, port_data in enumerate(ports.get(node_rec.id, OrderedDict()).values()):
             port_defaults = defaults.port
