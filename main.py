@@ -1,7 +1,7 @@
 """Example entrypoint: enrich minimal graph JSON into ELK JSON.
 
 Run:
-    python main.py -i example/sample_input_01.json -s example/elk_settings.example.toml -o /tmp/elk.json
+    python main.py -i examples/example_01.json -s examples/example.settings.toml -o /tmp/elk.json
 """
 
 import argparse
@@ -16,12 +16,13 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "-i",
         "--input",
+        required=True,
         help="Path to minimal input JSON",
     )
     parser.add_argument(
         "-s",
         "--settings",
-        help="Path to settings TOML/JSON",
+        help="Path to settings TOML/JSON (optional)",
     )
     parser.add_argument(
         "-o",
@@ -30,14 +31,19 @@ def main(argv: list[str] | None = None) -> int:
     )
     args = parser.parse_args(argv)
 
-    with Path(args.input).open("r", encoding="utf-8") as f:
+    input_path = Path(args.input)
+    if not input_path.exists():
+        parser.error(f"input file not found: {input_path}")
+
+    with input_path.open("r", encoding="utf-8") as f:
         minimal = MinimalGraphIn.model_validate_json(f.read())
 
-    settings = None
-    if args.settings and Path(args.settings).exists():
+    settings = sample_settings()
+    if args.settings:
+        settings_path = Path(args.settings)
+        if not settings_path.exists():
+            parser.error(f"settings file not found: {settings_path}")
         settings = _load_settings(args.settings)
-    else:
-        settings = sample_settings()
 
     canvas = build_canvas(minimal, settings)
     payload = canvas.model_dump(by_alias=True, exclude_none=True)

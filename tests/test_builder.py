@@ -5,7 +5,7 @@ from elkpydantic.settings import sample_settings
 
 
 def load_sample() -> MinimalGraphIn:
-    with open("json/sample_input_01.json", "r", encoding="utf-8") as f:
+    with open("examples/example_01.json", "r", encoding="utf-8") as f:
         return MinimalGraphIn.model_validate_json(f.read())
 
 
@@ -103,7 +103,7 @@ def test_icon_mapping_case_insensitive():
 def test_toml_properties_are_flattened():
     from elkpydantic.builder import _load_settings
 
-    settings = _load_settings("json/elk_settings.example.toml")
+    settings = _load_settings("examples/example.settings.toml")
 
     # dotted keys preserved instead of nested objects
     assert settings.node_defaults.label.properties == {"font.size": 16}
