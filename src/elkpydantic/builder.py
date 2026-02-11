@@ -60,7 +60,7 @@ def _candidate_aliases(label: str) -> List[str]:
 
 def split_endpoint(endpoint: str) -> Tuple[str, Optional[str]]:
     if ":" in endpoint:
-        node_part, port_part = endpoint.split(":", 1)
+        node_part, port_part = endpoint.split(":", 1)  # split once
         return node_part.strip(), port_part.strip()
     return endpoint.strip(), None
 

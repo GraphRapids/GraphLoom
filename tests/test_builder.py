@@ -72,3 +72,16 @@ def test_node_to_node_edge_without_ports():
     assert canvas.children[1].ports == []
     assert canvas.edges[0].sources == [canvas.children[0].id]
     assert canvas.edges[0].targets == [canvas.children[1].id]
+
+
+def test_port_name_with_colons():
+    minimal = MinimalGraphIn(
+        nodes=[{"l": "Router1"}, {"l": "Router2"}],
+        edges=[{"l": "weird", "a": "Router1:Fo:1/0/0", "b": "Router2:Fo:2/0/0"}],
+    )
+    settings = sample_settings()
+    canvas = build_canvas(minimal, settings)
+
+    # Port ids should include sanitized portion after first colon only
+    assert canvas.edges[0].sources[0] == "router1_fo_1_0_0"
+    assert canvas.edges[0].targets[0] == "router2_fo_2_0_0"
