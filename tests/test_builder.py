@@ -37,3 +37,13 @@ def test_sample_build():
 
     # Layout options sourced from settings
     assert canvas.layoutOptions.org_eclipse_elk_algorithm == "layered"
+
+
+def test_icon_mapping():
+    minimal = MinimalGraphIn(
+        nodes=[{"l": "FW1", "t": "firewall"}],
+        edges=[],
+    )
+    settings = sample_settings()
+    canvas = build_canvas(minimal, settings)
+    assert canvas.children[0].icon == "clarity:firewall-line"
