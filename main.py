@@ -1,7 +1,7 @@
 """Example entrypoint: enrich minimal graph JSON into ELK JSON.
 
 Run:
-    python main.py -i json/sample_input_01.json -s json/elk_settings.example.toml -o /tmp/elk.json
+    python main.py -i example/sample_input_01.json -s example/elk_settings.example.toml -o /tmp/elk.json
 """
 
 import argparse
@@ -16,19 +16,16 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "-i",
         "--input",
-        default="json/sample_input_01.json",
-        help="Path to minimal input JSON (default: json/sample_input_01.json)",
+        help="Path to minimal input JSON",
     )
     parser.add_argument(
         "-s",
         "--settings",
-        default="json/elk_settings.example.toml",
-        help="Path to settings TOML/JSON (default: json/elk_settings.example.toml)",
+        help="Path to settings TOML/JSON",
     )
     parser.add_argument(
         "-o",
         "--output",
-        default="/Users/abo/Downloads/output.json",
         help="Where to write ELK JSON (default: stdout)",
     )
     args = parser.parse_args(argv)

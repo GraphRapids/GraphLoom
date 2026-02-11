@@ -70,4 +70,4 @@ Default type is `default` with no icon; mapping wins when present, otherwise ove
 
 ## Development
 - Run tests: `. .venv/bin/activate && pytest -q`
-- Example run: `elkpydantic json/sample_input_01.json -s json/elk_settings.example.toml`
+- Example run: `elkpydantic example/sample_input_01.json -s example/elk_settings.example.toml`

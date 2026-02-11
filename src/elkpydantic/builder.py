@@ -221,8 +221,6 @@ def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> C
         edges=canvas_edges,
     )
 
-
-# --- CLI helper ---
 def _load_settings(path: str | None) -> ElkSettings:
     if not path:
         return sample_settings()
