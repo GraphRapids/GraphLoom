@@ -58,3 +58,17 @@ def test_default_icon_none():
     canvas = build_canvas(minimal, settings)
     assert canvas.children[0].type == "default"
     assert canvas.children[0].icon is None
+
+
+def test_node_to_node_edge_without_ports():
+    minimal = MinimalGraphIn(
+        nodes=[{"l": "A"}, {"l": "B"}],
+        edges=[{"l": "link", "a": "A", "b": "B"}],  # no ports specified
+    )
+    settings = sample_settings()
+    canvas = build_canvas(minimal, settings)
+
+    assert canvas.children[0].ports == []
+    assert canvas.children[1].ports == []
+    assert canvas.edges[0].sources == [canvas.children[0].id]
+    assert canvas.edges[0].targets == [canvas.children[1].id]

@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import re
 from collections import OrderedDict
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple, Optional
 
 try:  # Python 3.11+
     import tomllib  # type: ignore
@@ -58,11 +58,11 @@ def _candidate_aliases(label: str) -> List[str]:
     return list(aliases)
 
 
-def split_endpoint(endpoint: str) -> Tuple[str, str]:
+def split_endpoint(endpoint: str) -> Tuple[str, Optional[str]]:
     if ":" in endpoint:
         node_part, port_part = endpoint.split(":", 1)
         return node_part.strip(), port_part.strip()
-    return endpoint.strip(), "port"
+    return endpoint.strip(), None
 
 
 class _NodeRecord(BaseModel):
@@ -113,6 +113,8 @@ def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> C
         for endpoint in (e.a, e.b):
             node_part, port_part = split_endpoint(endpoint)
             node_rec = ensure_node(node_part)
+            if port_part is None:
+                continue  # node-to-node edge; no port to create
             port_key = sanitize_id(port_part)
             if node_rec.id not in ports:
                 ports[node_rec.id] = OrderedDict()
@@ -174,6 +176,9 @@ def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> C
         for endpoint, bucket in ((e.a, sources), (e.b, targets)):
             node_part, port_part = split_endpoint(endpoint)
             node_rec = ensure_node(node_part)
+            if port_part is None:
+                bucket.append(node_rec.id)
+                continue
             port_key = sanitize_id(port_part)
             port_id = ports[node_rec.id][port_key]["id"]
             bucket.append(port_id)
