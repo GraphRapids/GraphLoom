@@ -134,7 +134,7 @@ class Canvas(BaseModel):
     model_config = {"populate_by_name": True}
 
     id: str = "canvas"
-    layoutOptions: LayoutOptions = Field(default_factory=LayoutOptions)
+    layoutOptions: LayoutOptions
     children: List[Node]
     edges: List[Edge] = Field(default_factory=list)
 
