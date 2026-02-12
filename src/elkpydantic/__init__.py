@@ -6,8 +6,11 @@ from .enums import (
     NodeLabelPlacement,
     NodeSizeConstraint,
     NodeSizeOption,
+    PortConstraints,
     PortLabelPlacement,
     PortSide,
+    SizeConstraint,
+    SizeOptions,
 )
 from .node import Node, NodeLabel
 from .options import (
@@ -40,6 +43,14 @@ __all__ = [
     "Properties",
     "Direction",
     "LayeringStrategy",
+    "NodeLabelPlacement",
+    "NodeSizeConstraint",
+    "NodeSizeOption",
+    "PortConstraints",
+    "PortLabelPlacement",
+    "PortSide",
+    "SizeConstraint",
+    "SizeOptions",
     "MinimalGraphIn",
     "MinimalEdgeIn",
     "MinimalNodeIn",
