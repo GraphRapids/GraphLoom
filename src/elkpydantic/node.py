@@ -2,8 +2,6 @@ from typing import List, Optional
 from pydantic import BaseModel, field_validator
 
 from .base import Properties
-from .enums import NodeLabelPlacement, NodeSizeConstraint, NodeSizeOption, PortLabelPlacement
-from .options import LabelLayoutOptions, NodeLayoutOptions
 from .port import Port
 
 class NodeLabel(BaseModel):
@@ -11,7 +9,6 @@ class NodeLabel(BaseModel):
     width: float
     height: float
     properties: Properties
-    layoutOptions: LabelLayoutOptions | None = None
     
 class Node(BaseModel):
     id: str
@@ -22,7 +19,6 @@ class Node(BaseModel):
     labels: List[NodeLabel]
     ports: List[Port]
     properties: Properties
-    layoutOptions: NodeLayoutOptions | None = None
 
     @field_validator("ports")
     @classmethod
@@ -32,6 +28,9 @@ class Node(BaseModel):
             raise ValueError("Port ids must be unique within a node")
         
         for i, p in enumerate(v):
-            p.properties = p.properties.model_copy(update={"port.index": i})
+            props = p.properties.model_dump()
+            props["org.eclipse.elk.port.index"] = i
+            props.pop("port.index", None)
+            p.properties = Properties(**props)
 
         return v

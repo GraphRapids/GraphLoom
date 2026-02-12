@@ -26,7 +26,7 @@ def test_sample_build():
         if child.id.startswith("bgp_"):
             assert len(child.ports) == 2
             for idx, port in enumerate(child.ports):
-                assert port.properties.model_dump().get("port.index") == idx
+                assert port.properties.model_dump().get("org.eclipse.elk.port.index") == idx
         else:
             assert child.ports == []
 
