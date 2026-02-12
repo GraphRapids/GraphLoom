@@ -12,7 +12,15 @@ except ImportError:  # pragma: no cover
 
 from pydantic import BaseModel
 
-from .canvas import Canvas, LayoutOptions
+from .canvas import Canvas
+from .options import (
+    EdgeLayoutOptions,
+    LabelLayoutOptions,
+    LayoutOptions,
+    NodeLayoutOptions,
+    ParentLayoutOptions,
+    PortLayoutOptions,
+)
 from .base import Properties, _gen_id
 from .edge import Edge, EdgeLabel
 from .node import Node, NodeLabel
@@ -72,6 +80,64 @@ class _NodeRecord(BaseModel):
     aliases: List[str]
 
 
+def _layout_aliases(model_cls: type[BaseModel]) -> set[str]:
+    return {f.alias or name for name, f in model_cls.model_fields.items()}
+
+
+def _split_layout_options(
+    options: Dict[str, Any],
+) -> tuple[
+    LayoutOptions,
+    NodeLayoutOptions | None,
+    EdgeLayoutOptions | None,
+    PortLayoutOptions | None,
+    LabelLayoutOptions | None,
+]:
+    parent_aliases = _layout_aliases(ParentLayoutOptions)
+    node_aliases = _layout_aliases(NodeLayoutOptions)
+    edge_aliases = _layout_aliases(EdgeLayoutOptions)
+    port_aliases = _layout_aliases(PortLayoutOptions)
+    label_aliases = _layout_aliases(LabelLayoutOptions)
+
+    parent_opts: Dict[str, Any] = {}
+    node_opts: Dict[str, Any] = {}
+    edge_opts: Dict[str, Any] = {}
+    port_opts: Dict[str, Any] = {}
+    label_opts: Dict[str, Any] = {}
+    unknown: List[str] = []
+
+    for key, value in options.items():
+        matched = False
+        if key in parent_aliases:
+            parent_opts[key] = value
+            matched = True
+        if key in node_aliases:
+            node_opts[key] = value
+            matched = True
+        if key in edge_aliases:
+            edge_opts[key] = value
+            matched = True
+        if key in port_aliases:
+            port_opts[key] = value
+            matched = True
+        if key in label_aliases:
+            label_opts[key] = value
+            matched = True
+        if not matched:
+            unknown.append(key)
+
+    if unknown:
+        unknown_sorted = ", ".join(sorted(unknown))
+        raise ValueError(f"Unknown layout option identifiers: {unknown_sorted}")
+
+    parent_layout = LayoutOptions(**parent_opts)
+    node_layout = NodeLayoutOptions(**node_opts) if node_opts else None
+    edge_layout = EdgeLayoutOptions(**edge_opts) if edge_opts else None
+    port_layout = PortLayoutOptions(**port_opts) if port_opts else None
+    label_layout = LabelLayoutOptions(**label_opts) if label_opts else None
+    return parent_layout, node_layout, edge_layout, port_layout, label_layout
+
+
 def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> Canvas:
     settings = settings or sample_settings()
 
@@ -129,6 +195,14 @@ def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> C
 
     # 3) Build concrete nodes
     canvas_children: List[Node] = []
+    (
+        parent_layout,
+        node_layout,
+        edge_layout,
+        port_layout,
+        label_layout,
+    ) = _split_layout_options(settings.layout_options)
+
     for node_rec in nodes:
         defaults = type_overrides_lc.get(node_rec.type) or settings.node_defaults
         icon = type_icon_map_lc.get(node_rec.type, defaults.icon)
@@ -140,6 +214,7 @@ def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> C
                 width=port_defaults.label.width,
                 height=port_defaults.label.height,
                 properties=Properties(**port_defaults.label.properties),
+                layoutOptions=label_layout,
             )
             port = Port(
                 id=port_data["id"],
@@ -147,6 +222,7 @@ def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> C
                 height=port_defaults.height,
                 labels=[port_label],
                 properties=Properties(**port_defaults.properties),
+                layoutOptions=port_layout,
             )
             node_ports.append(port)
 
@@ -155,6 +231,7 @@ def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> C
             width=defaults.label.width,
             height=defaults.label.height,
             properties=Properties(**defaults.label.properties),
+            layoutOptions=label_layout,
         )
 
         canvas_children.append(
@@ -167,6 +244,7 @@ def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> C
                 labels=[node_label],
                 ports=node_ports,
                 properties=Properties(**defaults.properties),
+                layoutOptions=node_layout,
             )
         )
 
@@ -200,6 +278,7 @@ def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> C
             width=edge_defaults.label.width,
             height=edge_defaults.label.height,
             properties=Properties(**edge_defaults.label.properties),
+            layoutOptions=label_layout,
         )
         canvas_edges.append(
             Edge(
@@ -208,15 +287,13 @@ def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> C
                 targets=targets,
                 labels=[edge_label],
                 properties=Properties(**edge_defaults.properties),
+                layoutOptions=edge_layout,
             )
         )
 
-    # 5) Layout options
-    layout_options = LayoutOptions(**settings.layout_options)
-
     return Canvas(
         id="canvas",
-        layoutOptions=layout_options,
+        layoutOptions=parent_layout,
         children=canvas_children,
         edges=canvas_edges,
     )
