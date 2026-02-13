@@ -106,9 +106,9 @@ def test_toml_properties_are_flattened():
     settings = _load_settings("examples/example.settings.toml")
 
     # dotted keys preserved instead of nested objects
-    assert settings.node_defaults.label.properties == {"font.size": 16}
-    assert settings.node_defaults.port.properties == {"port.index": 0}
+    assert settings.node_defaults.label.properties == {"org.eclipse.elk.font.size": 16}
+    assert settings.node_defaults.port.properties == {"org.eclipse.elk.port.index": 0}
     assert settings.edge_defaults.label.properties == {
-        "font.size": 10,
-        "edgeLabels.inline": False,
+        "org.eclipse.elk.font.size": 10,
+        "org.eclipse.elk.edgeLabels.inline": False,
     }

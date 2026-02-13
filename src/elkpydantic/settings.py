@@ -77,7 +77,7 @@ def sample_settings() -> ElkSettings:
                     "text": "Node",
                     "width": 150,
                     "height": 16,
-                    "properties": {"font.size": 16},
+                    "properties": {"org.eclipse.elk.font.size": 16},
                 },
                 "port": {
                     "width": 2.0,
@@ -86,14 +86,14 @@ def sample_settings() -> ElkSettings:
                         "text": "Port",
                         "width": 50,
                         "height": 6,
-                        "properties": {"font.size": 6},
+                        "properties": {"org.eclipse.elk.font.size": 6},
                     },
-                    "properties": {"port.index": 0},
+                    "properties": {"org.eclipse.elk.port.index": 0},
                 },
                 "properties": {
-                    "portConstraints": "[FIXED_ORDER]",
-                    "portLabels.placement": "[OUTSIDE, NEXT_TO_PORT_IF_POSSIBLE]",
-                    "nodeLabels.placement": "[OUTSIDE, V_BOTTOM, H_CENTER, H_PRIORITY]",
+                    "org.eclipse.elk.portConstraints": "[FIXED_ORDER]",
+                    "org.eclipse.elk.portLabels.placement": "[OUTSIDE, NEXT_TO_PORT_IF_POSSIBLE]",
+                    "org.eclipse.elk.nodeLabels.placement": "[OUTSIDE, V_BOTTOM, H_CENTER, H_PRIORITY]",
                 },
             },
             "edge_defaults": {
@@ -101,9 +101,15 @@ def sample_settings() -> ElkSettings:
                     "text": "Edge",
                     "width": 100,
                     "height": 10,
-                    "properties": {"font.size": 10, "edgeLabels.inline": False},
+                    "properties": {
+                        "org.eclipse.elk.font.size": 10,
+                        "org.eclipse.elk.edgeLabels.inline": False,
+                    },
                 },
-                "properties": {"edge.type": "UNDIRECTED", "edge.thickness": 1},
+                "properties": {
+                    "org.eclipse.elk.edge.type": "UNDIRECTED",
+                    "org.eclipse.elk.edge.thickness": 1,
+                },
             },
             "type_icon_map": {
                 "router": "mdi:router",

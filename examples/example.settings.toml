@@ -16,37 +16,37 @@ type = "default"
 icon = ""
 width = 50
 height = 50
-properties.portConstraints = "[FIXED_ORDER]"
-properties.portLabels.placement = "[OUTSIDE, NEXT_TO_PORT_IF_POSSIBLE]"
-properties.nodeLabels.placement = "[OUTSIDE, V_BOTTOM, H_CENTER, H_PRIORITY]"
+properties.org.eclipse.elk.portConstraints = "[FIXED_ORDER]"
+properties.org.eclipse.elk.portLabels.placement = "[OUTSIDE, NEXT_TO_PORT_IF_POSSIBLE]"
+properties.org.eclipse.elk.nodeLabels.placement = "[OUTSIDE, V_BOTTOM, H_CENTER, H_PRIORITY]"
 
 [node_defaults.label]
 text = "Node"
 width = 150
 height = 16
-properties.font.size = 16
+properties.org.eclipse.elk.font.size = 16
 
 [node_defaults.port]
 width = 2.0
 height = 2.0
-properties.port.index = 0
+properties.org.eclipse.elk.port.index = 0
 
 [node_defaults.port.label]
 text = "Port"
 width = 100
 height = 8
-properties.font.size = 8
+properties.org.eclipse.elk.font.size = 8
 
 [edge_defaults]
-properties.edge.type = "UNDIRECTED"
-properties.edge.thickness = 1
+properties.org.eclipse.elk.edge.type = "UNDIRECTED"
+properties.org.eclipse.elk.edge.thickness = 1
 
 [edge_defaults.label]
 text = "Edge"
 width = 100
 height = 10
-properties.font.size = 10
-properties.edgeLabels.inline = false
+properties.org.eclipse.elk.font.size = 10
+properties.org.eclipse.elk.edgeLabels.inline = false
 
 auto_create_missing_nodes = true
 
