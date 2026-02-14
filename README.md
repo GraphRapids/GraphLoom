@@ -43,10 +43,14 @@ from elkpydantic import MinimalGraphIn, build_canvas, sample_settings
 
 minimal = MinimalGraphIn.model_validate({
     "nodes": [
-        {"name": "Subgraph 1", "nodes": ["Node 1", "Node 2"], "links": ["Node 1:xe0 -> Node 2:xe0"]},
-        "Node 3",
+        {
+            "name": "Subgraph 1",
+            "nodes": [{"name": "Node 1", "type": "router"}, {"name": "Node 2", "type": "switch"}],
+            "links": [{"label": "Fabric 1", "type": "100G", "from": "Node 1:xe0", "to": "Node 2:xe0"}],
+        },
+        {"name": "Node 3", "type": "router"},
     ],
-    "links": ["Subgraph 1 -> Node 3"],
+    "links": [{"label": "Uplink 1", "type": "MPLS", "from": "Subgraph 1", "to": "Node 3"}],
 })
 settings = sample_settings()  # or ElkSettings.model_validate_file(...)
 canvas = build_canvas(minimal, settings)
@@ -59,25 +63,29 @@ elk_json = canvas.model_dump_json(indent=2, by_alias=True)
   - Subgraph nodes are emitted without `width`/`height`, and carry nested `children` + `edges` in output.
 - **links[] / edges[]**: each item can be:
   - string shorthand: `"Node A:eth0 -> Node B:eth1"`
-  - object: `{ "name": "<optional label>", "type": "<class>", "from": "Node:Port", "to": "Node:Port" }`
+  - object: `{ "label": "<optional edge label>", "type": "<optional link type>", "from": "Node:Port", "to": "Node:Port" }`
 Unknown nodes referenced in edges are auto-created when `auto_create_missing_nodes` is true (default).
 - JSON Schema: `examples/minimal-input.schema.json`
 
 Backwards-compatible aliases are accepted for input:
 - node: `l` -> `name`, `t` -> `type`
-- edge: `l` -> `name`, `t` -> `type`, `a` -> `from`, `b` -> `to`
+- edge: `l`/`name` -> `label`, `t` -> `type`, `a` -> `from`, `b` -> `to`
 
 ## Settings (TOML/JSON or env)
 See `examples/example.settings.toml`
-- `layout_options`: ELK keys (flattened by builder) e.g. `org.eclipse.elk.algorithm`.
+- `layout_options`: canvas-level ELK keys only (for root `layoutOptions`), e.g. `org.eclipse.elk.algorithm`.
 - `node_defaults`: defaults for leaf nodes; sizes, label defaults, port defaults, properties; `type="default"`, `icon=""` (None).
 - `subgraph_defaults`: defaults for subgraph nodes (nodes with children). If omitted, it falls back to `node_defaults`.
 - `edge_defaults`: label defaults and properties.
+- `edge_type_overrides`: per-type EdgeDefaults block (for example `100g`, `mpls`).
 - `type_overrides`: per-type full NodeDefaults block.
 - `type_icon_map`: mapping type → icon (full list in example file).
 - `auto_create_missing_nodes`: bool.
 
-Precedence for node styling: role defaults (`node_defaults`/`subgraph_defaults`) then `type_overrides` for the effective type.
+Precedence:
+- Node styling and node-level ELK options: role defaults (`node_defaults`/`subgraph_defaults`) then `type_overrides` for the effective type.
+- Edge styling: `edge_defaults` then `edge_type_overrides` (when edge `type` matches).
+- Edge label text: explicit `label`, then fallback to `edge_defaults.label.text`.
 
 ### Type→icon mapping (excerpt)
 ```

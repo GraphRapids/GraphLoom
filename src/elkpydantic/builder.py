@@ -69,10 +69,9 @@ class MinimalNodeIn(BaseModel):
 class MinimalEdgeIn(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    name: str | None = Field(
-        default=None,
-        validation_alias=AliasChoices("name", "l"),
-    )
+    id: str | None = None
+    name: str | None = Field(default=None, validation_alias=AliasChoices("name"))
+    label: str | None = Field(default=None, validation_alias=AliasChoices("label", "l"))
     type: str | None = Field(default=None, validation_alias=AliasChoices("type", "t"))
     source: str = Field(
         validation_alias=AliasChoices("from", "a"),
@@ -230,91 +229,12 @@ def _normalize_properties(data: Dict[str, Any]) -> Dict[str, Any]:
     return normalized
 
 
-def _options_to_properties(model_cls: type[BaseModel], data: Dict[str, Any]) -> Dict[str, Any]:
-    if not data:
-        return {}
-    model = model_cls(**data)
-    return model.model_dump(by_alias=True, exclude_none=True)
-
-
-def _split_layout_options(
-    options: Dict[str, Any],
-) -> tuple[
-    LayoutOptions,
-    Dict[str, Any],
-    Dict[str, Any],
-    Dict[str, Any],
-    Dict[str, Any],
-    Dict[str, Any],
-    Dict[str, Any],
-]:
-    parent_aliases = _layout_aliases(ParentLayoutOptions)
-    node_aliases = _layout_aliases(NodeLayoutOptions)
-    edge_aliases = _layout_aliases(EdgeLayoutOptions)
-    port_aliases = _layout_aliases(PortLayoutOptions)
-    label_aliases = _layout_aliases(LabelLayoutOptions)
-
-    parent_opts: Dict[str, Any] = {}
-    node_opts: Dict[str, Any] = {}
-    edge_opts: Dict[str, Any] = {}
-    port_opts: Dict[str, Any] = {}
-    label_common_opts: Dict[str, Any] = {}
-    label_node_opts: Dict[str, Any] = {}
-    label_edge_opts: Dict[str, Any] = {}
-    unknown: List[str] = []
-
-    for key, value in options.items():
-        matched = False
-        if key in parent_aliases:
-            parent_opts[key] = value
-            matched = True
-        if key in node_aliases:
-            node_opts[key] = value
-            matched = True
-        if key in edge_aliases:
-            edge_opts[key] = value
-            matched = True
-        if key in port_aliases:
-            port_opts[key] = value
-            matched = True
-        if key in label_aliases:
-            if key.startswith("org.eclipse.elk.nodeLabels."):
-                label_node_opts[key] = value
-            elif key.startswith("org.eclipse.elk.edgeLabels."):
-                label_edge_opts[key] = value
-            else:
-                label_common_opts[key] = value
-            matched = True
-        if not matched:
-            unknown.append(key)
-
-    if unknown:
-        unknown_sorted = ", ".join(sorted(unknown))
-        raise ValueError(f"Unknown layout option identifiers: {unknown_sorted}")
-
-    parent_layout = LayoutOptions(**parent_opts)
-    node_props = _options_to_properties(NodeLayoutOptions, node_opts)
-    edge_props = _options_to_properties(EdgeLayoutOptions, edge_opts)
-    port_props = _options_to_properties(PortLayoutOptions, port_opts)
-    label_common_props = _options_to_properties(LabelLayoutOptions, label_common_opts)
-    node_label_props = {
-        **label_common_props,
-        **_options_to_properties(LabelLayoutOptions, label_node_opts),
-    }
-    edge_label_props = {
-        **label_common_props,
-        **_options_to_properties(LabelLayoutOptions, label_edge_opts),
-    }
-    port_label_props = dict(label_common_props)
-    return (
-        parent_layout,
-        node_props,
-        edge_props,
-        port_props,
-        node_label_props,
-        edge_label_props,
-        port_label_props,
-    )
+def _canvas_layout_options(options: Dict[str, Any]) -> LayoutOptions:
+    disallowed = sorted(key for key in options if key not in _ELK_OPTION_IDENTIFIERS)
+    if disallowed:
+        disallowed_list = ", ".join(disallowed)
+        raise ValueError(f"Unknown layout option identifiers: {disallowed_list}")
+    return LayoutOptions(**options)
 
 
 def _merge_properties(base: Properties, extra: Dict[str, Any]) -> Properties:
@@ -328,18 +248,11 @@ def _merge_properties(base: Properties, extra: Dict[str, Any]) -> Properties:
 
 def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> Canvas:
     settings = settings or sample_settings()
-    (
-        parent_layout,
-        node_props,
-        edge_props,
-        port_props,
-        node_label_props,
-        edge_label_props,
-        port_label_props,
-    ) = _split_layout_options(settings.layout_options)
+    parent_layout = _canvas_layout_options(settings.layout_options)
 
     type_overrides_lc = {k.lower(): v for k, v in settings.type_overrides.items()}
     type_icon_map_lc = {k.lower(): v for k, v in settings.type_icon_map.items()}
+    edge_type_overrides_lc = {k.lower(): v for k, v in settings.edge_type_overrides.items()}
 
     def build_scope(graph_data: MinimalGraphIn) -> tuple[List[Node], List[Edge]]:
         nodes: "OrderedDict[str, _NodeRecord]" = OrderedDict()
@@ -436,7 +349,7 @@ def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> C
                     height=port_defaults.label.height,
                     properties=_merge_properties(
                         Properties(**port_defaults.label.properties),
-                        port_label_props,
+                        {},
                     ),
                 )
                 node = Port(
@@ -446,7 +359,7 @@ def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> C
                     labels=[port_label],
                     properties=_merge_properties(
                         Properties(**port_defaults.properties),
-                        port_props,
+                        {},
                     ),
                 )
                 node_ports.append(node)
@@ -457,7 +370,7 @@ def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> C
                 height=defaults.label.height,
                 properties=_merge_properties(
                     Properties(**defaults.label.properties),
-                    node_label_props,
+                    {},
                 ),
             )
 
@@ -471,7 +384,7 @@ def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> C
                 "edges": child_edges,
                 "properties": _merge_properties(
                     Properties(**defaults.properties),
-                    node_props,
+                    {},
                 ),
             }
             if not is_subgraph:
@@ -497,7 +410,8 @@ def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> C
                 port_id = ports[node_rec.id][port_key]["id"]
                 bucket.append(port_id)
 
-            base_edge_id = sanitize_id(edge.name or _gen_id("edge"))
+            edge_id_source = edge.id or edge.label or edge.name or _gen_id("edge")
+            base_edge_id = sanitize_id(edge_id_source)
             if base_edge_id in edge_ids:
                 edge_ids[base_edge_id] += 1
                 edge_id = f"{base_edge_id}_{edge_ids[base_edge_id]}"
@@ -505,15 +419,19 @@ def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> C
                 edge_ids[base_edge_id] = 1
                 edge_id = base_edge_id
 
-            edge_defaults = settings.edge_defaults
-            edge_label_text = edge.name or edge_defaults.label.text
+            edge_type_norm = (edge.type or "").strip().lower()
+            edge_defaults = edge_type_overrides_lc.get(edge_type_norm) or settings.edge_defaults
+            edge_label_text = edge.label or edge.name or edge_defaults.label.text
+            edge_runtime_props: Dict[str, Any] = {}
+            if edge.type:
+                edge_runtime_props["elkpydantic.edgeType"] = edge.type
             edge_label = EdgeLabel(
                 text=edge_label_text,
                 width=edge_defaults.label.width,
                 height=edge_defaults.label.height,
                 properties=_merge_properties(
                     Properties(**edge_defaults.label.properties),
-                    edge_label_props,
+                    {},
                 ),
             )
             scope_edges.append(
@@ -524,7 +442,7 @@ def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> C
                     labels=[edge_label],
                     properties=_merge_properties(
                         Properties(**edge_defaults.properties),
-                        edge_props,
+                        edge_runtime_props,
                     ),
                 )
             )

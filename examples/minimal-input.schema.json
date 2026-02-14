@@ -5,6 +5,18 @@
   "$defs": {
     "MinimalEdgeIn": {
       "properties": {
+        "id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Id"
+        },
         "name": {
           "anyOf": [
             {
@@ -16,6 +28,18 @@
           ],
           "default": null,
           "title": "Name"
+        },
+        "label": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Label"
         },
         "type": {
           "anyOf": [
@@ -89,7 +113,7 @@
           "title": "Nodes",
           "type": "array"
         },
-        "edges": {
+        "links": {
           "items": {
             "anyOf": [
               {
@@ -100,7 +124,7 @@
               }
             ]
           },
-          "title": "Edges",
+          "title": "Links",
           "type": "array"
         }
       },
@@ -126,7 +150,7 @@
       "title": "Nodes",
       "type": "array"
     },
-    "edges": {
+    "links": {
       "items": {
         "anyOf": [
           {
@@ -137,7 +161,7 @@
           }
         ]
       },
-      "title": "Edges",
+      "title": "Links",
       "type": "array"
     }
   },

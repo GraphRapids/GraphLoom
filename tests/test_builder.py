@@ -24,11 +24,17 @@ def test_sample_build():
     assert len(subgraph.edges) == 1
     assert subgraph.edges[0].sources == ["node_1_hu0_0_0_0"]
     assert subgraph.edges[0].targets == ["node_2_hu0_0_0_0"]
+    assert subgraph.edges[0].labels[0].text == "Fabric 1"
+    assert subgraph.edges[0].properties.model_dump().get("elkpydantic.edgeType") == "100G"
+    assert subgraph.children[0].type == "router"
+    assert subgraph.children[1].type == "switch"
 
     node_3 = next(child for child in canvas.children if child.id == "node_3")
     node_4 = next(child for child in canvas.children if child.id == "node_4")
     leaf_nodes = subgraph.children + [node_3, node_4]
     assert all(node.width is not None and node.height is not None for node in leaf_nodes)
+    assert node_3.type == "router"
+    assert node_4.type == "firewall"
 
     # Ports derived from edges
     for child in subgraph.children:
@@ -46,6 +52,9 @@ def test_sample_build():
     assert canvas.edges[0].targets == ["node_3"]
     assert canvas.edges[1].sources == ["node_3_eth0"]
     assert canvas.edges[1].targets == ["node_4_eth1"]
+    assert canvas.edges[0].labels[0].text == "Uplink 1"
+    assert canvas.edges[1].labels[0].text == settings.edge_defaults.label.text
+    assert canvas.edges[0].properties.model_dump().get("elkpydantic.edgeType") == "MPLS"
 
     # Layout options sourced from settings
     assert canvas.layoutOptions.org_eclipse_elk_algorithm == "layered"
@@ -113,6 +122,38 @@ def test_links_alias_and_string_shorthand():
     assert canvas.edges[0].sources == ["a_eth0"]
     assert canvas.edges[0].targets == ["b_eth1"]
     assert canvas.edges[0].labels[0].text == settings.edge_defaults.label.text
+
+
+def test_edge_label_prefers_label_field_over_name():
+    minimal = MinimalGraphIn(
+        nodes=["A", "B"],
+        links=[{"name": "Legacy Name", "label": "Preferred Label", "from": "A", "to": "B"}],
+    )
+    settings = sample_settings()
+    canvas = build_canvas(minimal, settings)
+
+    assert canvas.edges[0].labels[0].text == "Preferred Label"
+    assert canvas.edges[0].id == "preferred_label"
+
+
+def test_edge_type_overrides_apply_for_matching_type():
+    minimal = MinimalGraphIn(
+        nodes=["A", "B"],
+        links=[{"type": "100G", "from": "A", "to": "B"}],
+    )
+    settings = sample_settings()
+    override = settings.edge_defaults.model_copy(deep=True)
+    override.label.text = "100G default label"
+    override.label.width = 222
+    override.properties["org.eclipse.elk.edge.thickness"] = 7
+    settings.edge_type_overrides["100g"] = override
+
+    canvas = build_canvas(minimal, settings)
+
+    assert canvas.edges[0].labels[0].text == "100G default label"
+    assert canvas.edges[0].labels[0].width == 222
+    assert canvas.edges[0].properties.model_dump()["org.eclipse.elk.edge.thickness"] == 7
+    assert canvas.edges[0].properties.model_dump()["elkpydantic.edgeType"] == "100G"
 
 
 def test_role_defaults_apply_separately_for_subgraph_and_leaf_nodes():
@@ -232,6 +273,14 @@ def test_toml_properties_are_flattened():
         "org.eclipse.elk.font.size": 10,
         "org.eclipse.elk.edgeLabels.inline": False,
     }
+    assert settings.edge_type_overrides["100g"].label.properties == {
+        "org.eclipse.elk.font.size": 11,
+        "org.eclipse.elk.edgeLabels.inline": False,
+    }
+    assert settings.edge_type_overrides["100g"].properties == {
+        "org.eclipse.elk.edge.type": "UNDIRECTED",
+        "org.eclipse.elk.edge.thickness": 3,
+    }
 
 
 def test_yaml_input_loader():
@@ -243,3 +292,19 @@ def test_yaml_input_loader():
 
     assert len(canvas.children) == 3
     assert len(canvas.edges) == 2
+
+
+def test_layout_options_are_not_merged_into_node_properties():
+    minimal = MinimalGraphIn(
+        nodes=["A"],
+        edges=[],
+    )
+    settings = sample_settings()
+    settings.layout_options["org.eclipse.elk.nodeLabels.placement"] = "[OUTSIDE]"
+    settings.node_defaults.properties.pop("org.eclipse.elk.nodeLabels.placement", None)
+
+    canvas = build_canvas(minimal, settings)
+    payload = canvas.model_dump(by_alias=True, exclude_none=True)
+
+    assert payload["layoutOptions"]["org.eclipse.elk.nodeLabels.placement"] == "[OUTSIDE]"
+    assert "org.eclipse.elk.nodeLabels.placement" not in payload["children"][0]["properties"]

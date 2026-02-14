@@ -50,6 +50,7 @@ class ElkSettings(BaseSettings):
     type_overrides: Dict[str, NodeDefaults] = Field(default_factory=dict)
     type_icon_map: Dict[str, str] = Field(default_factory=dict)
     edge_defaults: EdgeDefaults
+    edge_type_overrides: Dict[str, EdgeDefaults] = Field(default_factory=dict)
     auto_create_missing_nodes: bool = True
 
     @model_validator(mode="after")
@@ -66,8 +67,6 @@ def sample_settings() -> ElkSettings:
     return ElkSettings.model_validate(
         {
             "layout_options": {
-                "org.eclipse.elk.nodeLabels.placement": "[H_CENTER,V_BOTTOM,OUTSIDE,H_PRIORITY]",
-                "org.eclipse.elk.portLabels.placement": "[OUTSIDE]",
                 "org.eclipse.elk.algorithm": "layered",
                 "org.eclipse.elk.nodeSize.constraints": "MINIMUM_SIZE",
                 "org.eclipse.elk.nodeSize.options": "DEFAULT_MINIMUM_SIZE",
@@ -107,8 +106,8 @@ def sample_settings() -> ElkSettings:
             "subgraph_defaults": {
                 "type": "subgraph",
                 "icon": None,
-                "width": 50,
-                "height": 50,
+                "width": 100,
+                "height": 100,
                 "label": {
                     "text": "Node",
                     "width": 150,
@@ -129,7 +128,7 @@ def sample_settings() -> ElkSettings:
                 "properties": {
                     "org.eclipse.elk.portConstraints": "[FIXED_ORDER]",
                     "org.eclipse.elk.portLabels.placement": "[OUTSIDE, NEXT_TO_PORT_IF_POSSIBLE]",
-                    "org.eclipse.elk.nodeLabels.placement": "[OUTSIDE, V_BOTTOM, H_CENTER, H_PRIORITY]",
+                    "org.eclipse.elk.nodeLabels.placement": "[INSIDE, V_TOP, H_CENTER]",
                 },
             },
             "edge_defaults": {

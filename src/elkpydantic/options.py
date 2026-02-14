@@ -526,4 +526,4 @@ class LabelLayoutOptions(_LayoutOptionsBase):
 
 
 class LayoutOptions(ParentLayoutOptions):
-    pass
+    model_config = {"extra": "allow", "populate_by_name": True}

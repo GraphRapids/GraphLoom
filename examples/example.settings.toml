@@ -1,8 +1,6 @@
 # Example defaults mirroring sample_output_01.json
 
 [layout_options]
-org.eclipse.elk.nodeLabels.placement = "[H_CENTER,V_BOTTOM,OUTSIDE,H_PRIORITY]"
-org.eclipse.elk.portLabels.placement = "[OUTSIDE]"
 org.eclipse.elk.algorithm = "layered"
 org.eclipse.elk.nodeSize.constraints = "MINIMUM_SIZE"
 org.eclipse.elk.nodeSize.options = "DEFAULT_MINIMUM_SIZE"
@@ -70,6 +68,17 @@ text = "Edge"
 width = 100
 height = 10
 properties.org.eclipse.elk.font.size = 10
+properties.org.eclipse.elk.edgeLabels.inline = false
+
+[edge_type_overrides."100g"]
+properties.org.eclipse.elk.edge.type = "UNDIRECTED"
+properties.org.eclipse.elk.edge.thickness = 3
+
+[edge_type_overrides."100g".label]
+text = "100G"
+width = 140
+height = 12
+properties.org.eclipse.elk.font.size = 11
 properties.org.eclipse.elk.edgeLabels.inline = false
 
 auto_create_missing_nodes = true
