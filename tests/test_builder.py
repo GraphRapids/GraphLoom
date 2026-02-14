@@ -14,34 +14,38 @@ def test_sample_build():
     canvas = build_canvas(data, settings)
 
     assert canvas.id == "canvas"
-    assert len(canvas.children) == 2
+    assert len(canvas.children) == 3
 
-    subgraph = next(child for child in canvas.children if child.id == "a_subgraph")
+    subgraph = next(child for child in canvas.children if child.id == "subgraph_1")
     assert subgraph.type == "subgraph"
     assert subgraph.width is None
     assert subgraph.height is None
-    assert [child.id for child in subgraph.children] == ["bgp_1", "bgp_2"]
+    assert [child.id for child in subgraph.children] == ["node_1", "node_2"]
+    assert len(subgraph.edges) == 1
+    assert subgraph.edges[0].sources == ["node_1_hu0_0_0_0"]
+    assert subgraph.edges[0].targets == ["node_2_hu0_0_0_0"]
 
-    leaf_nodes = subgraph.children + [next(child for child in canvas.children if child.id == "unconnected_router")]
+    node_3 = next(child for child in canvas.children if child.id == "node_3")
+    node_4 = next(child for child in canvas.children if child.id == "node_4")
+    leaf_nodes = subgraph.children + [node_3, node_4]
     assert all(node.width is not None and node.height is not None for node in leaf_nodes)
 
     # Ports derived from edges
     for child in subgraph.children:
-        assert len(child.ports) == 2
+        assert len(child.ports) == 1
         for idx, port in enumerate(child.ports):
             assert port.properties.model_dump().get("org.eclipse.elk.port.index") == idx
-    assert leaf_nodes[-1].ports == []
+    assert len(node_3.ports) == 1
+    assert len(node_4.ports) == 1
 
     all_ids = [c.id for c in canvas.children] + [c.id for c in subgraph.children]
     assert all(node_id == node_id.lower() for node_id in all_ids)
 
     # Edge wiring
-    n1 = "bgp_1"
-    n2 = "bgp_2"
-    assert canvas.edges[0].sources == [f"{n1}_hu0_0_0_0"]
-    assert canvas.edges[0].targets == [f"{n2}_hu0_0_0_0"]
-    assert canvas.edges[1].sources == [f"{n1}_hu0_0_0_1"]
-    assert canvas.edges[1].targets == [f"{n2}_hu0_0_0_1"]
+    assert canvas.edges[0].sources == ["subgraph_1"]
+    assert canvas.edges[0].targets == ["node_3"]
+    assert canvas.edges[1].sources == ["node_3_eth0"]
+    assert canvas.edges[1].targets == ["node_4_eth1"]
 
     # Layout options sourced from settings
     assert canvas.layoutOptions.org_eclipse_elk_algorithm == "layered"
@@ -84,6 +88,31 @@ def test_subgraph_type_overrides_explicit_input_type():
     canvas = build_canvas(minimal, settings)
 
     assert canvas.children[0].type == "subgraph"
+
+
+def test_new_field_aliases_name_type_from_to():
+    minimal = MinimalGraphIn(
+        nodes=[{"name": "A"}, {"name": "B"}],
+        edges=[{"name": "link", "from": "A", "to": "B"}],
+    )
+    settings = sample_settings()
+    canvas = build_canvas(minimal, settings)
+
+    assert canvas.edges[0].sources == ["a"]
+    assert canvas.edges[0].targets == ["b"]
+
+
+def test_links_alias_and_string_shorthand():
+    minimal = MinimalGraphIn(
+        nodes=["A", "B"],
+        links=["A:eth0 -> B:eth1"],
+    )
+    settings = sample_settings()
+    canvas = build_canvas(minimal, settings)
+
+    assert canvas.edges[0].sources == ["a_eth0"]
+    assert canvas.edges[0].targets == ["b_eth1"]
+    assert canvas.edges[0].labels[0].text == settings.edge_defaults.label.text
 
 
 def test_role_defaults_apply_separately_for_subgraph_and_leaf_nodes():
@@ -197,9 +226,20 @@ def test_toml_properties_are_flattened():
     assert settings.node_defaults.label.properties == {"org.eclipse.elk.font.size": 16}
     assert settings.node_defaults.port.properties == {"org.eclipse.elk.port.index": 0}
     assert settings.subgraph_defaults is not None
-    assert settings.subgraph_defaults.label.properties == {"org.eclipse.elk.font.size": 16}
+    assert settings.subgraph_defaults.label.properties == {"org.eclipse.elk.font.size": 20}
     assert settings.subgraph_defaults.port.properties == {"org.eclipse.elk.port.index": 0}
     assert settings.edge_defaults.label.properties == {
         "org.eclipse.elk.font.size": 10,
         "org.eclipse.elk.edgeLabels.inline": False,
     }
+
+
+def test_yaml_input_loader():
+    from elkpydantic.builder import _load_input
+
+    data = _load_input("examples/example_01.yaml")
+    settings = sample_settings()
+    canvas = build_canvas(data, settings)
+
+    assert len(canvas.children) == 3
+    assert len(canvas.edges) == 2

@@ -1,13 +1,15 @@
 {
     "nodes": [
-        {"l": "A Subgraph", "nodes": [
-            { "l": "BGP-1", "t": "router" },
-            { "l": "BGP-2", "t": "router" }
-        ]},
-        { "l": "Unconnected router", "t": "router" }
+        {
+            "name": "Subgraph 1",
+            "nodes": ["Node 1", "Node 2"],
+            "links": ["Node 1:Hu0/0/0/0 -> Node 2:Hu0/0/0/0"]
+        },
+        "Node 3",
+        "Node 4"
     ],
-    "edges": [
-        { "l": "Uplink 1", "t": "100G", "a": "BGP-1:Hu0/0/0/0", "b": "BGP-2:Hu0/0/0/0" },
-        { "l": "Uplink 2", "t": "100G", "a": "BGP-1:Hu0/0/0/1", "b": "BGP-2:Hu0/0/0/1" }
+    "links": [
+        "Subgraph 1 -> Node 3",
+        "Node 3:eth0 -> Node 4:eth1"
     ]
 }

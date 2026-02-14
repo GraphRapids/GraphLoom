@@ -5,6 +5,7 @@ from typing import List, Optional
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 from .base import Properties
+from .edge import Edge
 from .port import Port
 
 class NodeLabel(BaseModel):
@@ -22,6 +23,7 @@ class Node(BaseModel):
     labels: List[NodeLabel]
     ports: List[Port] = Field(default_factory=list)
     children: List["Node"] = Field(default_factory=list)
+    edges: List[Edge] = Field(default_factory=list)
     properties: Properties
 
     @field_validator("ports")
@@ -47,9 +49,17 @@ class Node(BaseModel):
             raise ValueError("Child node ids must be unique within a parent node")
         return v
 
+    @field_validator("edges")
+    @classmethod
+    def edge_ids_unique(cls, v: List[Edge]):
+        ids = [e.id for e in v]
+        if len(ids) != len(set(ids)):
+            raise ValueError("Edge ids must be unique within a parent node")
+        return v
+
     @model_validator(mode="after")
     def validate_dimensions_by_role(self):
-        is_subgraph = bool(self.children)
+        is_subgraph = bool(self.children or self.edges)
         if is_subgraph and (self.width is not None or self.height is not None):
             raise ValueError("Subgraph nodes must not define width or height")
         if not is_subgraph and (self.width is None or self.height is None):

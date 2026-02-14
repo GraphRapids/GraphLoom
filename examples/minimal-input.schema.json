@@ -5,11 +5,7 @@
   "$defs": {
     "MinimalEdgeIn": {
       "properties": {
-        "l": {
-          "title": "L",
-          "type": "string"
-        },
-        "t": {
+        "name": {
           "anyOf": [
             {
               "type": "string"
@@ -19,32 +15,43 @@
             }
           ],
           "default": null,
-          "title": "T"
+          "title": "Name"
         },
-        "a": {
-          "title": "A",
+        "type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Type"
+        },
+        "from": {
+          "title": "From",
           "type": "string"
         },
-        "b": {
-          "title": "B",
+        "to": {
+          "title": "To",
           "type": "string"
         }
       },
       "required": [
-        "l",
-        "a",
-        "b"
+        "from",
+        "to"
       ],
       "title": "MinimalEdgeIn",
       "type": "object"
     },
     "MinimalNodeIn": {
       "properties": {
-        "l": {
-          "title": "L",
+        "name": {
+          "title": "Name",
           "type": "string"
         },
-        "t": {
+        "type": {
           "anyOf": [
             {
               "type": "string"
@@ -54,7 +61,7 @@
             }
           ],
           "default": null,
-          "title": "T"
+          "title": "Type"
         },
         "id": {
           "anyOf": [
@@ -70,14 +77,35 @@
         },
         "nodes": {
           "items": {
-            "$ref": "#/$defs/MinimalNodeIn"
+            "anyOf": [
+              {
+                "$ref": "#/$defs/MinimalNodeIn"
+              },
+              {
+                "type": "string"
+              }
+            ]
           },
           "title": "Nodes",
+          "type": "array"
+        },
+        "edges": {
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/MinimalEdgeIn"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "title": "Edges",
           "type": "array"
         }
       },
       "required": [
-        "l"
+        "name"
       ],
       "title": "MinimalNodeIn",
       "type": "object"
@@ -86,22 +114,35 @@
   "properties": {
     "nodes": {
       "items": {
-        "$ref": "#/$defs/MinimalNodeIn"
+        "anyOf": [
+          {
+            "$ref": "#/$defs/MinimalNodeIn"
+          },
+          {
+            "type": "string"
+          }
+        ]
       },
       "title": "Nodes",
       "type": "array"
     },
     "edges": {
       "items": {
-        "$ref": "#/$defs/MinimalEdgeIn"
+        "anyOf": [
+          {
+            "$ref": "#/$defs/MinimalEdgeIn"
+          },
+          {
+            "type": "string"
+          }
+        ]
       },
       "title": "Edges",
       "type": "array"
     }
   },
   "required": [
-    "nodes",
-    "edges"
+    "nodes"
   ],
   "title": "MinimalGraphIn",
   "type": "object"

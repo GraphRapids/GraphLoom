@@ -3,7 +3,8 @@ Enrich minimal graph JSON into fully-formed [ELK](https://www.eclipse.org/elk/) 
 Focus: keep authoring input tiny; derive ports/nodes from edges; centralize defaults in settings.
 
 ## What it does
-- Accepts **minimal input**: nodes with labels/types, edges with endpoints like `NodeA:Eth0`.
+- Accepts **minimal input JSON/YAML**: nodes and links with endpoints like `NodeA:Eth0`.
+- Supports shorthand for readability: node strings (`"Node A"`) and link strings (`"Node A:eth0 -> Node B:eth1"`).
 - **Auto-creates ports and nodes** from edge endpoints; preserves port order and sets `port.index`.
 - **Type→icon mapping**: picks icons from settings map (see below) or leaves icon `null` for default type.
 - All **layout options, sizes, fonts, properties** come from settings (TOML/JSON or env), not hardcoded.
@@ -23,11 +24,16 @@ elkpydantic examples/example_01.json \
   -s examples/example.settings.toml \
   -o /tmp/elk.json
 
+# YAML input works too
+elkpydantic examples/example_01.yaml \
+  -s examples/example.settings.toml \
+  -o /tmp/elk.json
+
 # Or directly
-python -m elkpydantic.builder -i examples/example_01.json -s examples/example.settings.toml
+python -m elkpydantic.builder examples/example_01.json -s examples/example.settings.toml
 ```
 Flags:
-- `-i/--input` minimal graph JSON (required)
+- `input` minimal graph JSON/YAML (required positional arg)
 - `-s/--settings` settings TOML/JSON (optional; uses built-in sample settings when omitted)
 - `-o/--output` write to file (stdout if omitted)
 
@@ -36,8 +42,11 @@ Flags:
 from elkpydantic import MinimalGraphIn, build_canvas, sample_settings
 
 minimal = MinimalGraphIn.model_validate({
-    "nodes": [{"l": "BGP 1", "t": "router"}],
-    "edges": [{"l": "uplink", "a": "BGP 1:xe-0/0/0", "b": "BGP 2:xe-0/0/1"}],
+    "nodes": [
+        {"name": "Subgraph 1", "nodes": ["Node 1", "Node 2"], "links": ["Node 1:xe0 -> Node 2:xe0"]},
+        "Node 3",
+    ],
+    "links": ["Subgraph 1 -> Node 3"],
 })
 settings = sample_settings()  # or ElkSettings.model_validate_file(...)
 canvas = build_canvas(minimal, settings)
@@ -45,11 +54,18 @@ elk_json = canvas.model_dump_json(indent=2, by_alias=True)
 ```
 
 ## Minimal input schema
-- **nodes[]**: `{ "l": "<label>", "t": "<type>", "id": "<optional custom id>", "nodes": [ ... ] }`
-  - `nodes` is optional and enables subgraphs (children). Subgraph nodes are emitted without `width`/`height`.
-- **edges[]**: `{ "l": "<label>", "t": "<class>", "a": "Node:Port", "b": "Node:Port" }`
+- **nodes[]**: either a string (`"Node 1"`) or `{ "name": "<label>", "type": "<type>", "id": "<optional custom id>", "nodes": [ ... ], "links": [ ... ] }`
+  - `nodes` and `links` on a node define a recursive subgraph scope.
+  - Subgraph nodes are emitted without `width`/`height`, and carry nested `children` + `edges` in output.
+- **links[] / edges[]**: each item can be:
+  - string shorthand: `"Node A:eth0 -> Node B:eth1"`
+  - object: `{ "name": "<optional label>", "type": "<class>", "from": "Node:Port", "to": "Node:Port" }`
 Unknown nodes referenced in edges are auto-created when `auto_create_missing_nodes` is true (default).
 - JSON Schema: `examples/minimal-input.schema.json`
+
+Backwards-compatible aliases are accepted for input:
+- node: `l` -> `name`, `t` -> `type`
+- edge: `l` -> `name`, `t` -> `type`, `a` -> `from`, `b` -> `to`
 
 ## Settings (TOML/JSON or env)
 See `examples/example.settings.toml`
@@ -76,4 +92,4 @@ Default type is `default` with no icon; mapping wins when present, otherwise ove
 
 ## Development
 - Run tests: `. .venv/bin/activate && pytest -q`
-- Example run: `elkpydantic -i examples/example_01.json -s examples/example.settings.toml`
+- Example run: `elkpydantic examples/example_01.yaml -s examples/example.settings.toml`
