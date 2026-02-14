@@ -17,6 +17,7 @@ def test_sample_build():
     assert len(canvas.children) == 2
 
     subgraph = next(child for child in canvas.children if child.id == "a_subgraph")
+    assert subgraph.type == "subgraph"
     assert subgraph.width is None
     assert subgraph.height is None
     assert [child.id for child in subgraph.children] == ["bgp_1", "bgp_2"]
@@ -61,10 +62,28 @@ def test_subgraph_dimensions_omitted_in_payload():
     payload = canvas.model_dump(by_alias=True, exclude_none=True)
 
     cluster = payload["children"][0]
+    assert cluster["type"] == "subgraph"
     assert "width" not in cluster
     assert "height" not in cluster
     assert cluster["children"][0]["width"] == settings.node_defaults.width
     assert cluster["children"][0]["height"] == settings.node_defaults.height
+
+
+def test_subgraph_type_overrides_explicit_input_type():
+    minimal = MinimalGraphIn(
+        nodes=[
+            {
+                "l": "Cluster",
+                "t": "router",
+                "nodes": [{"l": "A"}],
+            }
+        ],
+        edges=[],
+    )
+    settings = sample_settings()
+    canvas = build_canvas(minimal, settings)
+
+    assert canvas.children[0].type == "subgraph"
 
 
 def test_icon_mapping():
