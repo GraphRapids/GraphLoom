@@ -53,11 +53,14 @@ Unknown nodes referenced in edges are auto-created when `auto_create_missing_nod
 ## Settings (TOML/JSON or env)
 See `examples/example.settings.toml`
 - `layout_options`: ELK keys (flattened by builder) e.g. `org.eclipse.elk.algorithm`.
-- `node_defaults`: sizes, label defaults, port defaults, properties; `type="default"`, `icon=""` (None).
+- `node_defaults`: defaults for leaf nodes; sizes, label defaults, port defaults, properties; `type="default"`, `icon=""` (None).
+- `subgraph_defaults`: defaults for subgraph nodes (nodes with children). If omitted, it falls back to `node_defaults`.
 - `edge_defaults`: label defaults and properties.
 - `type_overrides`: per-type full NodeDefaults block.
 - `type_icon_map`: mapping type → icon (full list in example file).
 - `auto_create_missing_nodes`: bool.
+
+Precedence for node styling: role defaults (`node_defaults`/`subgraph_defaults`) then `type_overrides` for the effective type.
 
 ### Type→icon mapping (excerpt)
 ```

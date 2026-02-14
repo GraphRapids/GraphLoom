@@ -1,6 +1,6 @@
 from typing import Any, Dict, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -46,10 +46,18 @@ class ElkSettings(BaseSettings):
 
     layout_options: Dict[str, Any]
     node_defaults: NodeDefaults
+    subgraph_defaults: Optional[NodeDefaults] = None
     type_overrides: Dict[str, NodeDefaults] = Field(default_factory=dict)
     type_icon_map: Dict[str, str] = Field(default_factory=dict)
     edge_defaults: EdgeDefaults
     auto_create_missing_nodes: bool = True
+
+    @model_validator(mode="after")
+    def ensure_subgraph_defaults(self) -> "ElkSettings":
+        if self.subgraph_defaults is None:
+            self.subgraph_defaults = self.node_defaults.model_copy(deep=True)
+            self.subgraph_defaults.type = "subgraph"
+        return self
 
 
 # Handy in-code default configuration mirroring sample_output_01.json.
@@ -70,6 +78,34 @@ def sample_settings() -> ElkSettings:
             },
             "node_defaults": {
                 "type": "default",
+                "icon": None,
+                "width": 50,
+                "height": 50,
+                "label": {
+                    "text": "Node",
+                    "width": 150,
+                    "height": 16,
+                    "properties": {"org.eclipse.elk.font.size": 16},
+                },
+                "port": {
+                    "width": 2.0,
+                    "height": 2.0,
+                    "label": {
+                        "text": "Port",
+                        "width": 50,
+                        "height": 6,
+                        "properties": {"org.eclipse.elk.font.size": 6},
+                    },
+                    "properties": {"org.eclipse.elk.port.index": 0},
+                },
+                "properties": {
+                    "org.eclipse.elk.portConstraints": "[FIXED_ORDER]",
+                    "org.eclipse.elk.portLabels.placement": "[OUTSIDE, NEXT_TO_PORT_IF_POSSIBLE]",
+                    "org.eclipse.elk.nodeLabels.placement": "[OUTSIDE, V_BOTTOM, H_CENTER, H_PRIORITY]",
+                },
+            },
+            "subgraph_defaults": {
+                "type": "subgraph",
                 "icon": None,
                 "width": 50,
                 "height": 50,

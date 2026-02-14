@@ -1,5 +1,5 @@
 from elkpydantic.builder import MinimalGraphIn, build_canvas
-from elkpydantic.settings import sample_settings
+from elkpydantic.settings import ElkSettings, sample_settings
 
 
 def load_sample() -> MinimalGraphIn:
@@ -86,6 +86,50 @@ def test_subgraph_type_overrides_explicit_input_type():
     assert canvas.children[0].type == "subgraph"
 
 
+def test_role_defaults_apply_separately_for_subgraph_and_leaf_nodes():
+    minimal = MinimalGraphIn(
+        nodes=[
+            {
+                "l": "Cluster",
+                "nodes": [{"l": "Leaf"}],
+            }
+        ],
+        edges=[],
+    )
+    settings = sample_settings()
+    settings.node_defaults.label.width = 111
+    settings.node_defaults.icon = "leaf-icon"
+    assert settings.subgraph_defaults is not None
+    settings.subgraph_defaults.label.width = 222
+    settings.subgraph_defaults.icon = "subgraph-icon"
+
+    canvas = build_canvas(minimal, settings)
+
+    cluster = canvas.children[0]
+    leaf = cluster.children[0]
+    assert cluster.type == "subgraph"
+    assert cluster.labels[0].width == 222
+    assert cluster.icon == "subgraph-icon"
+    assert leaf.labels[0].width == 111
+    assert leaf.icon == "leaf-icon"
+
+
+def test_subgraph_defaults_fallback_to_node_defaults_when_omitted():
+    raw = sample_settings().model_dump()
+    raw.pop("subgraph_defaults", None)
+    settings = ElkSettings.model_validate(raw)
+
+    minimal = MinimalGraphIn(
+        nodes=[{"l": "Cluster", "nodes": [{"l": "Leaf"}]}],
+        edges=[],
+    )
+    canvas = build_canvas(minimal, settings)
+
+    cluster = canvas.children[0]
+    assert cluster.type == "subgraph"
+    assert cluster.labels[0].width == settings.node_defaults.label.width
+
+
 def test_icon_mapping():
     minimal = MinimalGraphIn(
         nodes=[{"l": "FW1", "t": "firewall"}],
@@ -152,6 +196,9 @@ def test_toml_properties_are_flattened():
     # dotted keys preserved instead of nested objects
     assert settings.node_defaults.label.properties == {"org.eclipse.elk.font.size": 16}
     assert settings.node_defaults.port.properties == {"org.eclipse.elk.port.index": 0}
+    assert settings.subgraph_defaults is not None
+    assert settings.subgraph_defaults.label.properties == {"org.eclipse.elk.font.size": 16}
+    assert settings.subgraph_defaults.port.properties == {"org.eclipse.elk.port.index": 0}
     assert settings.edge_defaults.label.properties == {
         "org.eclipse.elk.font.size": 10,
         "org.eclipse.elk.edgeLabels.inline": False,

@@ -307,8 +307,12 @@ def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> C
     ) = _split_layout_options(settings.layout_options)
 
     def build_node(node_rec: _NodeRecord) -> Node:
-        effective_type = "subgraph" if node_rec.child_ids else node_rec.type
-        defaults = type_overrides_lc.get(effective_type) or settings.node_defaults
+        is_subgraph = bool(node_rec.child_ids)
+        effective_type = "subgraph" if is_subgraph else node_rec.type
+        role_defaults = settings.subgraph_defaults if is_subgraph else settings.node_defaults
+        if role_defaults is None:
+            role_defaults = settings.node_defaults
+        defaults = type_overrides_lc.get(effective_type) or role_defaults
         icon = type_icon_map_lc.get(effective_type, defaults.icon)
         node_ports: List[Port] = []
         for port_data in ports.get(node_rec.id, OrderedDict()).values():
