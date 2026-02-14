@@ -57,6 +57,25 @@ canvas = build_canvas(minimal, settings)
 elk_json = canvas.model_dump_json(indent=2, by_alias=True)
 ```
 
+### Library usage with YAML input
+```python
+from pathlib import Path
+
+import yaml
+
+from elkpydantic import MinimalGraphIn, build_canvas, sample_settings
+
+yaml_path = Path("examples/example_01.yaml")
+raw = yaml.safe_load(yaml_path.read_text(encoding="utf-8")) or {}
+
+minimal = MinimalGraphIn.model_validate(raw)
+settings = sample_settings()
+canvas = build_canvas(minimal, settings)
+
+payload = canvas.model_dump(by_alias=True, exclude_none=True)
+elk_json = canvas.model_dump_json(indent=2, by_alias=True)
+```
+
 ## Minimal input schema
 - **nodes[]**: either a string (`"Node 1"`) or `{ "name": "<label>", "type": "<type>", "id": "<optional custom id>", "nodes": [ ... ], "links": [ ... ] }`
   - `nodes` and `links` on a node define a recursive subgraph scope.
