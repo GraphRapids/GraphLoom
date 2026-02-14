@@ -45,7 +45,8 @@ elk_json = canvas.model_dump_json(indent=2, by_alias=True)
 ```
 
 ## Minimal input schema
-- **nodes[]**: `{ "l": "<label>", "t": "<type>", "id": "<optional custom id>" }`
+- **nodes[]**: `{ "l": "<label>", "t": "<type>", "id": "<optional custom id>", "nodes": [ ... ] }`
+  - `nodes` is optional and enables subgraphs (children). Subgraph nodes are emitted without `width`/`height`.
 - **edges[]**: `{ "l": "<label>", "t": "<class>", "a": "Node:Port", "b": "Node:Port" }`
 Unknown nodes referenced in edges are auto-created when `auto_create_missing_nodes` is true (default).
 

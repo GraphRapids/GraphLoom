@@ -10,7 +10,7 @@ try:  # Python 3.11+
 except ImportError:  # pragma: no cover
     import tomli as tomllib  # type: ignore
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from .canvas import Canvas
 from .options import (
@@ -32,6 +32,7 @@ class MinimalNodeIn(BaseModel):
     l: str
     t: str | None = None
     id: str | None = None
+    nodes: List["MinimalNodeIn"] = Field(default_factory=list)
 
 
 class MinimalEdgeIn(BaseModel):
@@ -44,6 +45,9 @@ class MinimalEdgeIn(BaseModel):
 class MinimalGraphIn(BaseModel):
     nodes: List[MinimalNodeIn]
     edges: List[MinimalEdgeIn]
+
+
+MinimalNodeIn.model_rebuild()
 
 
 def sanitize_id(value: str) -> str:
@@ -78,6 +82,8 @@ class _NodeRecord(BaseModel):
     label: str
     type: str
     aliases: List[str]
+    parent_id: str | None = None
+    child_ids: List[str] = Field(default_factory=list)
 
 
 def _layout_aliases(model_cls: type[BaseModel]) -> set[str]:
@@ -220,29 +226,47 @@ def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> C
     settings = settings or sample_settings()
 
     # 1) Prepare node records and alias index
-    nodes: List[_NodeRecord] = []
+    nodes: "OrderedDict[str, _NodeRecord]" = OrderedDict()
+    root_node_ids: List[str] = []
     alias_index: Dict[str, str] = {}
     type_overrides_lc = {k.lower(): v for k, v in settings.type_overrides.items()}
     type_icon_map_lc = {k.lower(): v for k, v in settings.type_icon_map.items()}
 
-    def register_node(label: str, node_type: str | None = None) -> _NodeRecord:
+    def register_node(
+        label: str,
+        node_type: str | None = None,
+        parent_id: str | None = None,
+    ) -> _NodeRecord:
         node_id = sanitize_id(label)
+        if node_id in nodes:
+            raise ValueError(f"Duplicate node id '{node_id}' derived from '{label}'")
         node_type_norm = (node_type or settings.node_defaults.type).lower()
         record = _NodeRecord(
             id=node_id,
             label=label,
             type=node_type_norm,
             aliases=_candidate_aliases(label),
+            parent_id=parent_id,
         )
-        nodes.append(record)
+        nodes[node_id] = record
+        if parent_id is None:
+            root_node_ids.append(node_id)
+        else:
+            nodes[parent_id].child_ids.append(node_id)
         for a in record.aliases:
             alias_index.setdefault(a, record.id)
+        alias_index.setdefault(node_id, node_id)
         return record
 
-    for n in data.nodes:
+    def register_input_node(n: MinimalNodeIn, parent_id: str | None = None):
         node_id_source = n.id or n.l
         node_type = n.t or settings.node_defaults.type
-        register_node(node_id_source, node_type)
+        record = register_node(node_id_source, node_type, parent_id=parent_id)
+        for child in n.nodes:
+            register_input_node(child, record.id)
+
+    for n in data.nodes:
+        register_input_node(n)
 
     # 2) Collect ports from edges, auto-creating nodes as needed
     ports: Dict[str, OrderedDict[str, Dict[str, str]]] = {}
@@ -251,7 +275,7 @@ def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> C
         token_norm = sanitize_id(node_token)
         if token_norm in alias_index:
             node_id = alias_index[token_norm]
-            return next(n for n in nodes if n.id == node_id)
+            return nodes[node_id]
         if not settings.auto_create_missing_nodes:
             raise ValueError(f"Unknown node '{node_token}' referenced by edge")
         return register_node(node_token)
@@ -272,7 +296,6 @@ def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> C
                 }
 
     # 3) Build concrete nodes
-    canvas_children: List[Node] = []
     (
         parent_layout,
         node_props,
@@ -283,11 +306,11 @@ def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> C
         port_label_props,
     ) = _split_layout_options(settings.layout_options)
 
-    for node_rec in nodes:
+    def build_node(node_rec: _NodeRecord) -> Node:
         defaults = type_overrides_lc.get(node_rec.type) or settings.node_defaults
         icon = type_icon_map_lc.get(node_rec.type, defaults.icon)
         node_ports: List[Port] = []
-        for i, port_data in enumerate(ports.get(node_rec.id, OrderedDict()).values()):
+        for port_data in ports.get(node_rec.id, OrderedDict()).values():
             port_defaults = defaults.port
             port_label = PortLabel(
                 text=port_data["label"],
@@ -319,21 +342,28 @@ def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> C
                 node_label_props,
             ),
         )
+        child_nodes = [build_node(nodes[child_id]) for child_id in node_rec.child_ids]
+        node_kwargs: Dict[str, Any] = {
+            "id": node_rec.id,
+            "type": node_rec.type,
+            "icon": icon,
+            "labels": [node_label],
+            "ports": node_ports,
+            "children": child_nodes,
+            "properties": _merge_properties(
+                Properties(**defaults.properties),
+                node_props,
+            ),
+        }
+        if not child_nodes:
+            node_kwargs["width"] = defaults.width
+            node_kwargs["height"] = defaults.height
+        return Node(**node_kwargs)
 
+    canvas_children: List[Node] = []
+    for node_id in root_node_ids:
         canvas_children.append(
-            Node(
-                id=node_rec.id,
-                type=node_rec.type,
-                icon=icon,
-                width=defaults.width,
-                height=defaults.height,
-                labels=[node_label],
-                ports=node_ports,
-                properties=_merge_properties(
-                    Properties(**defaults.properties),
-                    node_props,
-                ),
-            )
+            build_node(nodes[node_id])
         )
 
     # 4) Build edges

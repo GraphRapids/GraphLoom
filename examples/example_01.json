@@ -1,7 +1,9 @@
 {
     "nodes": [
-        { "l": "BGP-1", "t": "router" },
-        { "l": "BGP-2", "t": "router" },
+        {"l": "A Subgraph", "nodes": [
+            { "l": "BGP-1", "t": "router" },
+            { "l": "BGP-2", "t": "router" }
+        ]},
         { "l": "Unconnected router", "t": "router" }
     ],
     "edges": [

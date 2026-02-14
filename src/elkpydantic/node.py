@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 from typing import List, Optional
-from pydantic import BaseModel, field_validator
+
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 from .base import Properties
 from .port import Port
@@ -14,10 +17,11 @@ class Node(BaseModel):
     id: str
     type: str
     icon: Optional[str] = None
-    width: float
-    height: float
+    width: Optional[float] = None
+    height: Optional[float] = None
     labels: List[NodeLabel]
-    ports: List[Port]
+    ports: List[Port] = Field(default_factory=list)
+    children: List["Node"] = Field(default_factory=list)
     properties: Properties
 
     @field_validator("ports")
@@ -34,3 +38,23 @@ class Node(BaseModel):
             p.properties = Properties(**props)
 
         return v
+
+    @field_validator("children")
+    @classmethod
+    def child_ids_unique(cls, v: List["Node"]):
+        ids = [c.id for c in v]
+        if len(ids) != len(set(ids)):
+            raise ValueError("Child node ids must be unique within a parent node")
+        return v
+
+    @model_validator(mode="after")
+    def validate_dimensions_by_role(self):
+        is_subgraph = bool(self.children)
+        if is_subgraph and (self.width is not None or self.height is not None):
+            raise ValueError("Subgraph nodes must not define width or height")
+        if not is_subgraph and (self.width is None or self.height is None):
+            raise ValueError("Leaf nodes must define both width and height")
+        return self
+
+
+Node.model_rebuild()

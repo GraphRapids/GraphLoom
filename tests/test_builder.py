@@ -1,5 +1,3 @@
-import json
-
 from elkpydantic.builder import MinimalGraphIn, build_canvas
 from elkpydantic.settings import sample_settings
 
@@ -16,19 +14,25 @@ def test_sample_build():
     canvas = build_canvas(data, settings)
 
     assert canvas.id == "canvas"
-    assert len(canvas.children) == 3  # includes unconnected router
+    assert len(canvas.children) == 2
 
-    child_ids = [c.id for c in canvas.children]
-    assert all(cid == cid.lower() for cid in child_ids)
+    subgraph = next(child for child in canvas.children if child.id == "a_subgraph")
+    assert subgraph.width is None
+    assert subgraph.height is None
+    assert [child.id for child in subgraph.children] == ["bgp_1", "bgp_2"]
+
+    leaf_nodes = subgraph.children + [next(child for child in canvas.children if child.id == "unconnected_router")]
+    assert all(node.width is not None and node.height is not None for node in leaf_nodes)
 
     # Ports derived from edges
-    for child in canvas.children:
-        if child.id.startswith("bgp_"):
-            assert len(child.ports) == 2
-            for idx, port in enumerate(child.ports):
-                assert port.properties.model_dump().get("org.eclipse.elk.port.index") == idx
-        else:
-            assert child.ports == []
+    for child in subgraph.children:
+        assert len(child.ports) == 2
+        for idx, port in enumerate(child.ports):
+            assert port.properties.model_dump().get("org.eclipse.elk.port.index") == idx
+    assert leaf_nodes[-1].ports == []
+
+    all_ids = [c.id for c in canvas.children] + [c.id for c in subgraph.children]
+    assert all(node_id == node_id.lower() for node_id in all_ids)
 
     # Edge wiring
     n1 = "bgp_1"
@@ -40,6 +44,27 @@ def test_sample_build():
 
     # Layout options sourced from settings
     assert canvas.layoutOptions.org_eclipse_elk_algorithm == "layered"
+
+
+def test_subgraph_dimensions_omitted_in_payload():
+    minimal = MinimalGraphIn(
+        nodes=[
+            {
+                "l": "Cluster",
+                "nodes": [{"l": "A"}, {"l": "B"}],
+            }
+        ],
+        edges=[],
+    )
+    settings = sample_settings()
+    canvas = build_canvas(minimal, settings)
+    payload = canvas.model_dump(by_alias=True, exclude_none=True)
+
+    cluster = payload["children"][0]
+    assert "width" not in cluster
+    assert "height" not in cluster
+    assert cluster["children"][0]["width"] == settings.node_defaults.width
+    assert cluster["children"][0]["height"] == settings.node_defaults.height
 
 
 def test_icon_mapping():
