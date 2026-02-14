@@ -42,13 +42,13 @@ width = 50
 height = 50
 properties.org.eclipse.elk.portConstraints = "[FIXED_ORDER]"
 properties.org.eclipse.elk.portLabels.placement = "[OUTSIDE, NEXT_TO_PORT_IF_POSSIBLE]"
-properties.org.eclipse.elk.nodeLabels.placement = "[OUTSIDE, V_BOTTOM, H_CENTER, H_PRIORITY]"
+properties.org.eclipse.elk.nodeLabels.placement = "[INSIDE, V_TOP, H_CENTER]"
 
 [subgraph_defaults.label]
-text = "Node"
-width = 150
-height = 16
-properties.org.eclipse.elk.font.size = 16
+text = "Subgraph"
+width = 300
+height = 20
+properties.org.eclipse.elk.font.size = 20
 
 [subgraph_defaults.port]
 width = 2.0

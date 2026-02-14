@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Faerkeren/ElkPydantic/examples/minimal-input.schema.json",
+  "description": "Schema for ElkPydantic minimal graph input.",
+  "$defs": {
+    "MinimalEdgeIn": {
+      "properties": {
+        "l": {
+          "title": "L",
+          "type": "string"
+        },
+        "t": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "T"
+        },
+        "a": {
+          "title": "A",
+          "type": "string"
+        },
+        "b": {
+          "title": "B",
+          "type": "string"
+        }
+      },
+      "required": [
+        "l",
+        "a",
+        "b"
+      ],
+      "title": "MinimalEdgeIn",
+      "type": "object"
+    },
+    "MinimalNodeIn": {
+      "properties": {
+        "l": {
+          "title": "L",
+          "type": "string"
+        },
+        "t": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "T"
+        },
+        "id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Id"
+        },
+        "nodes": {
+          "items": {
+            "$ref": "#/$defs/MinimalNodeIn"
+          },
+          "title": "Nodes",
+          "type": "array"
+        }
+      },
+      "required": [
+        "l"
+      ],
+      "title": "MinimalNodeIn",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "nodes": {
+      "items": {
+        "$ref": "#/$defs/MinimalNodeIn"
+      },
+      "title": "Nodes",
+      "type": "array"
+    },
+    "edges": {
+      "items": {
+        "$ref": "#/$defs/MinimalEdgeIn"
+      },
+      "title": "Edges",
+      "type": "array"
+    }
+  },
+  "required": [
+    "nodes",
+    "edges"
+  ],
+  "title": "MinimalGraphIn",
+  "type": "object"
+}
