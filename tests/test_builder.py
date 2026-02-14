@@ -267,6 +267,8 @@ def test_toml_properties_are_flattened():
     assert settings.node_defaults.label.properties == {"org.eclipse.elk.font.size": 16}
     assert settings.node_defaults.port.properties == {"org.eclipse.elk.port.index": 0}
     assert settings.subgraph_defaults is not None
+    assert settings.subgraph_defaults.width is None
+    assert settings.subgraph_defaults.height is None
     assert settings.subgraph_defaults.label.properties == {"org.eclipse.elk.font.size": 20}
     assert settings.subgraph_defaults.port.properties == {"org.eclipse.elk.port.index": 0}
     assert settings.edge_defaults.label.properties == {

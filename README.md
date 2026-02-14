@@ -75,7 +75,7 @@ Backwards-compatible aliases are accepted for input:
 See `examples/example.settings.toml`
 - `layout_options`: canvas-level ELK keys only (for root `layoutOptions`), e.g. `org.eclipse.elk.algorithm`.
 - `node_defaults`: defaults for leaf nodes; sizes, label defaults, port defaults, properties; `type="default"`, `icon=""` (None).
-- `subgraph_defaults`: defaults for subgraph nodes (nodes with children). If omitted, it falls back to `node_defaults`.
+- `subgraph_defaults`: defaults for subgraph nodes (nodes with children). `width`/`height` are optional and ignored for subgraphs.
 - `edge_defaults`: label defaults and properties.
 - `edge_type_overrides`: per-type EdgeDefaults block (for example `100g`, `mpls`).
 - `type_overrides`: per-type full NodeDefaults block.

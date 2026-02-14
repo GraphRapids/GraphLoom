@@ -28,6 +28,16 @@ class NodeDefaults(BaseModel):
     properties: Dict[str, Any] = Field(default_factory=dict)
 
 
+class SubgraphDefaults(BaseModel):
+    type: str
+    icon: str | None = None
+    width: float | None = None
+    height: float | None = None
+    label: LabelDefaults
+    port: PortDefaults
+    properties: Dict[str, Any] = Field(default_factory=dict)
+
+
 class EdgeDefaults(BaseModel):
     label: LabelDefaults
     properties: Dict[str, Any] = Field(default_factory=dict)
@@ -46,7 +56,7 @@ class ElkSettings(BaseSettings):
 
     layout_options: Dict[str, Any]
     node_defaults: NodeDefaults
-    subgraph_defaults: Optional[NodeDefaults] = None
+    subgraph_defaults: Optional[SubgraphDefaults] = None
     type_overrides: Dict[str, NodeDefaults] = Field(default_factory=dict)
     type_icon_map: Dict[str, str] = Field(default_factory=dict)
     edge_defaults: EdgeDefaults
@@ -56,8 +66,11 @@ class ElkSettings(BaseSettings):
     @model_validator(mode="after")
     def ensure_subgraph_defaults(self) -> "ElkSettings":
         if self.subgraph_defaults is None:
-            self.subgraph_defaults = self.node_defaults.model_copy(deep=True)
-            self.subgraph_defaults.type = "subgraph"
+            copied = self.node_defaults.model_dump()
+            copied["type"] = "subgraph"
+            copied["width"] = None
+            copied["height"] = None
+            self.subgraph_defaults = SubgraphDefaults.model_validate(copied)
         return self
 
 
@@ -106,8 +119,6 @@ def sample_settings() -> ElkSettings:
             "subgraph_defaults": {
                 "type": "subgraph",
                 "icon": None,
-                "width": 100,
-                "height": 100,
                 "label": {
                     "text": "Node",
                     "width": 150,
