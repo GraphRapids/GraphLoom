@@ -4,6 +4,7 @@ import shutil
 
 import pytest
 
+from elkpydantic import MinimalGraphIn, build_canvas, sample_settings
 from elkpydantic.elkjs import layout_with_elkjs
 import elkpydantic.elkjs as elkjs_mod
 
@@ -114,3 +115,28 @@ def test_ensure_workspace_installs_pinned_elkjs_version(monkeypatch, tmp_path):
 
     assert captured["cmd"][0:4] == ["npm", "install", "--no-fund", "--no-audit"]
     assert "elkjs@0.11.0" in captured["cmd"]
+
+
+def test_layout_with_elkjs_npm_mode_real_package_smoke(monkeypatch, tmp_path):
+    if shutil.which("node") is None or shutil.which("npm") is None:
+        pytest.skip("node and npm are required for real elkjs smoke test")
+
+    monkeypatch.setattr(elkjs_mod.Path, "home", lambda: tmp_path)
+
+    minimal = MinimalGraphIn.model_validate({"nodes": ["A", "B"], "links": ["A -> B"]})
+    graph = build_canvas(minimal, sample_settings()).model_dump(by_alias=True, exclude_none=True)
+
+    try:
+        result = layout_with_elkjs(graph, mode="npm", node_cmd="node")
+    except RuntimeError as exc:
+        # Environments without npm registry access should not fail the full unit suite.
+        if "Failed to install elkjs automatically" in str(exc):
+            pytest.skip("npm registry access unavailable for elkjs install")
+        raise
+
+    assert result["id"] == "canvas"
+    assert len(result["children"]) == 2
+    assert "x" in result["children"][0]
+    assert "y" in result["children"][0]
+    assert "$H" not in result
+    assert "$H" not in result["children"][0]
