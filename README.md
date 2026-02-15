@@ -171,3 +171,6 @@ GraphLoom builds on excellent open source projects:
 - [PyYAML](https://github.com/yaml/pyyaml)
 
 See `THIRD_PARTY_NOTICES.md` for attribution and license references.
+
+## License
+GraphLoom is licensed under the Apache License 2.0. See `LICENSE`.
