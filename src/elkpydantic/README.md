@@ -3,7 +3,6 @@
 Short explanation of each item in this folder:
 
 - `__init__.py`: Public package exports (`build_canvas`, models, enums, settings, and `layout_with_elkjs`).
-- `__pycache__/`: Python bytecode cache generated at runtime (not source code).
 - `base.py`: Shared primitives (`Properties`) and utility ID generator.
 - `builder.py`: Core input parsing + graph enrichment logic; also package CLI entrypoint.
 - `canvas.py`: Root ELK canvas model (`id`, `layoutOptions`, top-level `children`/`edges`).
