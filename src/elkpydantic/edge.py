@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel
 
 from .base import Properties
@@ -11,6 +11,7 @@ class EdgeLabel(BaseModel):
 
 class Edge(BaseModel):
     id: str
+    type: Optional[str] = None
     sources: List[str]
     targets: List[str]
     labels: List[EdgeLabel]

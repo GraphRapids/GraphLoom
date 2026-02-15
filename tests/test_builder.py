@@ -28,7 +28,7 @@ def test_sample_build():
     assert subgraph.edges[0].sources == ["node_1_hu0_0_0_0"]
     assert subgraph.edges[0].targets == ["node_2_hu0_0_0_0"]
     assert subgraph.edges[0].labels[0].text == "Fabric 1"
-    assert subgraph.edges[0].properties.model_dump().get("elkpydantic.edgeType") == "100G"
+    assert subgraph.edges[0].type == "100G"
     assert subgraph.children[0].type == "router"
     assert subgraph.children[1].type == "switch"
 
@@ -57,7 +57,8 @@ def test_sample_build():
     assert canvas.edges[1].targets == ["node_4_eth1"]
     assert canvas.edges[0].labels[0].text == "Uplink 1"
     assert canvas.edges[1].labels[0].text == settings.edge_defaults.label.text
-    assert canvas.edges[0].properties.model_dump().get("elkpydantic.edgeType") == "MPLS"
+    assert canvas.edges[0].type == "MPLS"
+    assert canvas.edges[1].type is None
 
     # Layout options sourced from settings
     assert canvas.layoutOptions.org_eclipse_elk_algorithm == "layered"
@@ -240,7 +241,7 @@ def test_edge_type_overrides_apply_for_matching_type():
     assert canvas.edges[0].labels[0].text == "100G default label"
     assert canvas.edges[0].labels[0].width == 222
     assert canvas.edges[0].properties.model_dump()["org.eclipse.elk.edge.thickness"] == 7
-    assert canvas.edges[0].properties.model_dump()["elkpydantic.edgeType"] == "100G"
+    assert canvas.edges[0].type == "100G"
 
 
 def test_role_defaults_apply_separately_for_subgraph_and_leaf_nodes():
