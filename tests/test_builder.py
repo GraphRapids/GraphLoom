@@ -42,8 +42,8 @@ def test_sample_build():
     # Ports derived from edges
     for child in subgraph.children:
         assert len(child.ports) == 1
-        for idx, port in enumerate(child.ports):
-            assert port.properties.model_dump().get("org.eclipse.elk.port.index") == idx
+        for port in child.ports:
+            assert "org.eclipse.elk.port.index" not in port.properties.model_dump()
     assert len(node_3.ports) == 1
     assert len(node_4.ports) == 1
 
@@ -359,12 +359,12 @@ def test_toml_properties_are_flattened():
 
     # dotted keys preserved instead of nested objects
     assert settings.node_defaults.label.properties == {"org.eclipse.elk.font.size": 16}
-    assert settings.node_defaults.port.properties == {"org.eclipse.elk.port.index": 0}
+    assert settings.node_defaults.port.properties == {}
     assert settings.subgraph_defaults is not None
     assert settings.subgraph_defaults.width is None
     assert settings.subgraph_defaults.height is None
     assert settings.subgraph_defaults.label.properties == {"org.eclipse.elk.font.size": 20}
-    assert settings.subgraph_defaults.port.properties == {"org.eclipse.elk.port.index": 0}
+    assert settings.subgraph_defaults.port.properties == {}
     assert settings.edge_defaults.label.properties == {
         "org.eclipse.elk.font.size": 10,
         "org.eclipse.elk.edgeLabels.inline": False,

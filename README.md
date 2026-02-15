@@ -5,7 +5,7 @@ Focus: keep authoring input tiny; derive ports/nodes from edges; centralize defa
 ## What it does
 - Accepts **minimal input JSON/YAML**: nodes and links with endpoints like `NodeA:Eth0`.
 - Supports shorthand for readability: node strings (`"Node A"`) and link strings (`"Node A:eth0 -> Node B:eth1"`).
-- **Auto-creates ports and nodes** from edge endpoints; preserves port order and sets `port.index`.
+- **Auto-creates ports and nodes** from edge endpoints and preserves port order.
 - **Type→icon mapping**: picks icons from settings map (see below) or leaves icon `null` for default type.
 - All **layout options, sizes, fonts, properties** come from settings (TOML/JSON or env), not hardcoded.
 - Emits **ELK JSON** with proper aliases for layout keys.
