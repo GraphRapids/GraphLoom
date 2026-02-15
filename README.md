@@ -9,6 +9,7 @@ Focus: keep authoring input tiny; derive ports/nodes from edges; centralize defa
 - **Type→icon mapping**: picks icons from settings map (see below) or leaves icon `null` for default type.
 - All **layout options, sizes, fonts, properties** come from settings (TOML/JSON or env), not hardcoded.
 - Emits **ELK JSON** with proper aliases for layout keys.
+- Optional: run **local `elkjs`** from CLI/library to compute final coordinates and container sizes.
 
 ## Install
 ```bash
@@ -31,11 +32,29 @@ elkpydantic examples/example_01.yaml \
 
 # Or directly
 python -m elkpydantic.builder examples/example_01.json -s examples/example.settings.toml
+
+# Run local elkjs layout (requires Node.js + elkjs available to node)
+elkpydantic examples/example_01.yaml \
+  -s examples/example.settings.toml \
+  --layout
+
+# Auto-install elkjs into a local npm cache (~/.cache/elkpydantic/elkjs)
+elkpydantic examples/example_01.yaml \
+  -s examples/example.settings.toml \
+  --layout --elkjs-mode npm
+
+# npx is kept as an alias of npm mode
+elkpydantic examples/example_01.yaml \
+  -s examples/example.settings.toml \
+  --layout --elkjs-mode npx
 ```
 Flags:
 - `input` minimal graph JSON/YAML (required positional arg)
 - `-s/--settings` settings TOML/JSON (optional; uses built-in sample settings when omitted)
 - `-o/--output` write to file (stdout if omitted)
+- `--layout` run local elkjs layout before writing output
+- `--elkjs-mode` choose `node` (default), `npm` (auto-install cache), or `npx` (alias of `npm`) when `--layout` is used
+- `--node-cmd` Node.js executable name/path (default `node`)
 
 ## Library usage
 ```python
@@ -74,6 +93,25 @@ canvas = build_canvas(minimal, settings)
 
 payload = canvas.model_dump(by_alias=True, exclude_none=True)
 elk_json = canvas.model_dump_json(indent=2, by_alias=True)
+```
+
+### Library usage with local elkjs layout
+```python
+from elkpydantic import MinimalGraphIn, build_canvas, layout_with_elkjs, sample_settings
+
+minimal = MinimalGraphIn.model_validate({
+    "nodes": ["A", "B"],
+    "links": ["A:eth0 -> B:eth1"],
+})
+
+canvas = build_canvas(minimal, sample_settings())
+payload = canvas.model_dump(by_alias=True, exclude_none=True)
+
+# mode="node": requires elkjs installed for local node runtime
+laid_out = layout_with_elkjs(payload, mode="node")
+
+# mode="npm": auto-installs elkjs into ~/.cache/elkpydantic/elkjs when missing
+# laid_out = layout_with_elkjs(payload, mode="npm")
 ```
 
 ## Minimal input schema

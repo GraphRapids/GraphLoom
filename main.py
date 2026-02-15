@@ -9,6 +9,7 @@ import json
 from pathlib import Path
 
 from elkpydantic.builder import build_canvas, _load_input, _load_settings
+from elkpydantic.elkjs import layout_with_elkjs
 from elkpydantic.settings import sample_settings
 
 def main(argv: list[str] | None = None) -> int:
@@ -29,6 +30,22 @@ def main(argv: list[str] | None = None) -> int:
         "--output",
         help="Where to write ELK JSON (default: stdout)",
     )
+    parser.add_argument(
+        "--layout",
+        action="store_true",
+        help="Run local elkjs layout and include computed positions/sizes in output.",
+    )
+    parser.add_argument(
+        "--elkjs-mode",
+        choices=["node", "npm", "npx"],
+        default="node",
+        help="elkjs mode for --layout: node (preinstalled), npm (auto-install cache), npx (alias of npm).",
+    )
+    parser.add_argument(
+        "--node-cmd",
+        default="node",
+        help="Node.js executable used by --layout (default: node).",
+    )
     args = parser.parse_args(argv)
 
     input_path = Path(args.input)
@@ -46,6 +63,8 @@ def main(argv: list[str] | None = None) -> int:
 
     canvas = build_canvas(minimal, settings)
     payload = canvas.model_dump(by_alias=True, exclude_none=True)
+    if args.layout:
+        payload = layout_with_elkjs(payload, mode=args.elkjs_mode, node_cmd=args.node_cmd)
     output = json.dumps(payload, indent=2)
 
     if args.output:

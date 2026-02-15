@@ -23,6 +23,7 @@ from .options import (
 )
 from .base import Properties, _gen_id
 from .edge import Edge, EdgeLabel
+from .elkjs import layout_with_elkjs
 from .node import Node, NodeLabel
 from .port import Port, PortLabel
 from .settings import ElkSettings, sample_settings
@@ -528,12 +529,30 @@ def main(argv: List[str] | None = None) -> int:
     parser.add_argument("input", help="Path to minimal input JSON or YAML")
     parser.add_argument("-o", "--output", help="Where to write ELK JSON (default: stdout)")
     parser.add_argument("-s", "--settings", help="Path to settings TOML/JSON (optional)")
+    parser.add_argument(
+        "--layout",
+        action="store_true",
+        help="Run local elkjs layout and include computed positions/sizes in output.",
+    )
+    parser.add_argument(
+        "--elkjs-mode",
+        choices=["node", "npm", "npx"],
+        default="node",
+        help="elkjs mode for --layout: node (preinstalled), npm (auto-install cache), npx (alias of npm).",
+    )
+    parser.add_argument(
+        "--node-cmd",
+        default="node",
+        help="Node.js executable used by --layout (default: node).",
+    )
     args = parser.parse_args(argv)
 
     data = _load_input(args.input)
     settings = _load_settings(args.settings)
     canvas = build_canvas(data, settings)
     payload = canvas.model_dump(by_alias=True, exclude_none=True)
+    if args.layout:
+        payload = layout_with_elkjs(payload, mode=args.elkjs_mode, node_cmd=args.node_cmd)
     output = json.dumps(payload, indent=2)
 
     if args.output:

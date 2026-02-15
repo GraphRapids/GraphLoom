@@ -24,6 +24,7 @@ from .options import (
 from .port import Port, PortLabel
 from .edge import Edge,EdgeLabel
 from .builder import MinimalGraphIn, MinimalEdgeIn, MinimalNodeIn, build_canvas, sanitize_id
+from .elkjs import layout_with_elkjs
 from .settings import ElkSettings, sample_settings
 
 __all__ = [
@@ -55,6 +56,7 @@ __all__ = [
     "MinimalEdgeIn",
     "MinimalNodeIn",
     "build_canvas",
+    "layout_with_elkjs",
     "sanitize_id",
     "ElkSettings",
     "sample_settings",
