@@ -119,19 +119,17 @@ laid_out = layout_with_elkjs(payload, mode="node")
   - `nodes` and `links` on a node define a recursive subgraph scope.
   - Node `name`: min 1, max 20 chars, and must not contain `:` (edge endpoint syntax uses `node:port`).
   - Subgraph nodes are emitted without `width`/`height`, and carry nested `children` + `edges` in output.
-- **links[] / edges[]**: each item can be:
+- **links[]**: each item can be:
   - string shorthand: `"Node A:eth0 -> Node B:eth1"`
   - object: `{ "label": "<optional edge label>", "type": "<optional link type>", "from": "Node:Port", "to": "Node:Port" }`
   - Port name in `node:port`: min 1, max 15 chars.
-  - Edge label/name (when provided): min 1, max 40 chars.
+  - Edge label (when provided): min 1, max 40 chars.
 Unknown nodes referenced in edges are auto-created when `auto_create_missing_nodes` is true (default).
 - JSON Schema (bundled): `src/graphloom/schemas/minimal-input.schema.json`
 
-Backwards-compatible aliases are accepted for input:
-- node: `l` -> `name`, `t` -> `type`
-- edge: `l`/`name` -> `label`, `t` -> `type`, `a` -> `from`, `b` -> `to`
-The JSON Schema validates canonical keys only (`nodes`/`links`, `name`/`type`, `label`/`from`/`to`) and intentionally rejects alias forms.
-When validating against schema, prefer top-level `links` (not `edges`) and canonical edge fields (`label`, `from`, `to`).
+Only canonical keys are supported:
+- node: `name`, `type`, `id`, `nodes`, `links`
+- edge: `id`, `label`, `type`, `from`, `to`
 
 ## Settings (TOML/JSON or env)
 See `examples/example.settings.toml`

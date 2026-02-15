@@ -1,28 +1,116 @@
 {
   "nodes": [
-    { "l": "Core-1", "t": "router" },
-    { "l": "Core-2", "t": "router" },
-    { "l": "DC-SW1", "t": "switch" },
-    { "l": "DC-SW2", "t": "switch" },
-    { "l": "FW-EDGE", "t": "firewall" },
-    { "l": "Internet", "t": "internet" },
-    { "l": "DB1", "t": "database" },
-    { "l": "App1", "t": "server" },
-    { "l": "App2", "t": "server" },
-    { "l": "Monitoring", "t": "monitor" },
-    { "l": "VPN-Hub", "t": "vpn" }
+    {
+      "name": "Core-1",
+      "type": "router"
+    },
+    {
+      "name": "Core-2",
+      "type": "router"
+    },
+    {
+      "name": "DC-SW1",
+      "type": "switch"
+    },
+    {
+      "name": "DC-SW2",
+      "type": "switch"
+    },
+    {
+      "name": "FW-EDGE",
+      "type": "firewall"
+    },
+    {
+      "name": "Internet",
+      "type": "internet"
+    },
+    {
+      "name": "DB1",
+      "type": "database"
+    },
+    {
+      "name": "App1",
+      "type": "server"
+    },
+    {
+      "name": "App2",
+      "type": "server"
+    },
+    {
+      "name": "Monitoring",
+      "type": "monitor"
+    },
+    {
+      "name": "VPN-Hub",
+      "type": "vpn"
+    }
   ],
-  "edges": [
-    { "l": "Core Interconnect", "t": "100G", "a": "Core-1:xe0/0", "b": "Core-2:xe0/0" },
-    { "l": "Spine -> DC-SW1", "t": "40G", "a": "Core-1:xe0/1", "b": "DC-SW1:uplink1" },
-    { "l": "Spine -> DC-SW2", "t": "40G", "a": "Core-2:xe0/1", "b": "DC-SW2:uplink1" },
-    { "l": "DC-SW1 to FW inside", "t": "10G", "a": "DC-SW1:edge1", "b": "FW-EDGE:inside1" },
-    { "l": "DC-SW2 to FW inside", "t": "10G", "a": "DC-SW2:edge1", "b": "FW-EDGE:inside2" },
-    { "l": "FW to Internet", "t": "1G", "a": "FW-EDGE:outside", "b": "Internet" },
-    { "l": "FW to VPN Hub", "t": "1G", "a": "FW-EDGE:dmz1", "b": "VPN-Hub:wan1" },
-    { "l": "App1 access", "t": "1G", "a": "DC-SW1:access1", "b": "App1:eth0" },
-    { "l": "App2 access", "t": "1G", "a": "DC-SW2:access3", "b": "App2:eth0" },
-    { "l": "DB uplink", "t": "1G", "a": "DC-SW1:access2", "b": "DB1:eth0" },
-    { "l": "Monitoring tap", "t": "1G", "a": "Monitoring", "b": "Core-2" }
+  "links": [
+    {
+      "label": "Core Interconnect",
+      "type": "100G",
+      "from": "Core-1:xe0/0",
+      "to": "Core-2:xe0/0"
+    },
+    {
+      "label": "Spine -> DC-SW1",
+      "type": "40G",
+      "from": "Core-1:xe0/1",
+      "to": "DC-SW1:uplink1"
+    },
+    {
+      "label": "Spine -> DC-SW2",
+      "type": "40G",
+      "from": "Core-2:xe0/1",
+      "to": "DC-SW2:uplink1"
+    },
+    {
+      "label": "DC-SW1 to FW inside",
+      "type": "10G",
+      "from": "DC-SW1:edge1",
+      "to": "FW-EDGE:inside1"
+    },
+    {
+      "label": "DC-SW2 to FW inside",
+      "type": "10G",
+      "from": "DC-SW2:edge1",
+      "to": "FW-EDGE:inside2"
+    },
+    {
+      "label": "FW to Internet",
+      "type": "1G",
+      "from": "FW-EDGE:outside",
+      "to": "Internet"
+    },
+    {
+      "label": "FW to VPN Hub",
+      "type": "1G",
+      "from": "FW-EDGE:dmz1",
+      "to": "VPN-Hub:wan1"
+    },
+    {
+      "label": "App1 access",
+      "type": "1G",
+      "from": "DC-SW1:access1",
+      "to": "App1:eth0"
+    },
+    {
+      "label": "App2 access",
+      "type": "1G",
+      "from": "DC-SW2:access3",
+      "to": "App2:eth0"
+    },
+    {
+      "label": "DB uplink",
+      "type": "1G",
+      "from": "DC-SW1:access2",
+      "to": "DB1:eth0"
+    },
+    {
+      "label": "Monitoring tap",
+      "type": "1G",
+      "from": "Monitoring",
+      "to": "Core-2"
+    }
   ]
 }

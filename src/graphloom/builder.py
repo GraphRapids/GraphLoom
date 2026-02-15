@@ -10,7 +10,7 @@ try:  # Python 3.11+
 except ImportError:  # pragma: no cover
     import tomli as tomllib  # type: ignore
 
-from pydantic import AliasChoices, BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from .canvas import Canvas
 from .options import (
@@ -44,17 +44,13 @@ def _validate_length(value: str, *, field_name: str, min_len: int, max_len: int)
 
 
 class MinimalNodeIn(BaseModel):
-    model_config = ConfigDict(populate_by_name=True)
+    model_config = ConfigDict(extra="forbid")
 
-    name: str = Field(validation_alias=AliasChoices("name", "l"))
-    type: str | None = Field(default=None, validation_alias=AliasChoices("type", "t"))
+    name: str
+    type: str | None = None
     id: str | None = None
     nodes: List["MinimalNodeIn | str"] = Field(default_factory=list)
-    edges: List["MinimalEdgeIn | str"] = Field(
-        default_factory=list,
-        alias="links",
-        validation_alias=AliasChoices("edges", "links"),
-    )
+    links: List["MinimalEdgeIn | str"] = Field(default_factory=list)
 
     @field_validator("nodes", mode="before")
     @classmethod
@@ -71,14 +67,14 @@ class MinimalNodeIn(BaseModel):
                 normalized.append(node)
         return normalized
 
-    @field_validator("edges", mode="before")
+    @field_validator("links", mode="before")
     @classmethod
-    def normalize_edges(cls, v: Any):
+    def normalize_links(cls, v: Any):
         if v is None:
             return []
         if not isinstance(v, list):
             return v
-        return [_normalize_edge_entry(edge) for edge in v]
+        return [_normalize_link_entry(edge) for edge in v]
 
     @field_validator("name")
     @classmethod
@@ -96,24 +92,23 @@ class MinimalNodeIn(BaseModel):
 
 
 class MinimalEdgeIn(BaseModel):
-    model_config = ConfigDict(populate_by_name=True)
+    model_config = ConfigDict(extra="forbid")
 
     id: str | None = None
-    name: str | None = Field(default=None, validation_alias=AliasChoices("name"))
-    label: str | None = Field(default=None, validation_alias=AliasChoices("label", "l"))
-    type: str | None = Field(default=None, validation_alias=AliasChoices("type", "t"))
+    label: str | None = None
+    type: str | None = None
     source: str = Field(
-        validation_alias=AliasChoices("from", "a"),
+        validation_alias="from",
         serialization_alias="from",
     )
     target: str = Field(
-        validation_alias=AliasChoices("to", "b"),
+        validation_alias="to",
         serialization_alias="to",
     )
 
-    @field_validator("name", "label")
+    @field_validator("label")
     @classmethod
-    def validate_edge_name(cls, value: str | None) -> str | None:
+    def validate_edge_label(cls, value: str | None) -> str | None:
         if value is None:
             return None
         return _validate_length(
@@ -148,14 +143,10 @@ class MinimalEdgeIn(BaseModel):
 
 
 class MinimalGraphIn(BaseModel):
-    model_config = ConfigDict(populate_by_name=True)
+    model_config = ConfigDict(extra="forbid")
 
     nodes: List[MinimalNodeIn | str] = Field(default_factory=list)
-    edges: List[MinimalEdgeIn | str] = Field(
-        default_factory=list,
-        alias="links",
-        validation_alias=AliasChoices("edges", "links"),
-    )
+    links: List[MinimalEdgeIn | str] = Field(default_factory=list)
 
     @field_validator("nodes", mode="before")
     @classmethod
@@ -172,18 +163,18 @@ class MinimalGraphIn(BaseModel):
                 normalized.append(node)
         return normalized
 
-    @field_validator("edges", mode="before")
+    @field_validator("links", mode="before")
     @classmethod
-    def normalize_edges(cls, v: Any):
+    def normalize_links(cls, v: Any):
         if v is None:
             return []
         if not isinstance(v, list):
             return v
-        return [_normalize_edge_entry(edge) for edge in v]
+        return [_normalize_link_entry(edge) for edge in v]
 
     @model_validator(mode="after")
     def validate_non_empty_graph(self) -> "MinimalGraphIn":
-        if not self.nodes and not self.edges:
+        if not self.nodes and not self.links:
             raise ValueError("At least one node or one link must be defined.")
         return self
 
@@ -233,7 +224,7 @@ def _parse_link_shorthand(link: str) -> Dict[str, str]:
     return {"from": source, "to": target}
 
 
-def _normalize_edge_entry(edge: Any) -> Any:
+def _normalize_link_entry(edge: Any) -> Any:
     if isinstance(edge, str):
         return _parse_link_shorthand(edge)
     return edge
@@ -248,7 +239,7 @@ def _as_node(node: "MinimalNodeIn | str") -> "MinimalNodeIn":
 def _as_edge(edge: "MinimalEdgeIn | str") -> "MinimalEdgeIn":
     if isinstance(edge, MinimalEdgeIn):
         return edge
-    return MinimalEdgeIn.model_validate(_normalize_edge_entry(edge))
+    return MinimalEdgeIn.model_validate(_normalize_link_entry(edge))
 
 
 class _NodeRecord(BaseModel):
@@ -375,7 +366,7 @@ def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> C
                 raise ValueError(f"Unknown node '{node_token}' referenced by edge")
             return register_node(label=node_token)
 
-        for edge_raw in graph_data.edges:
+        for edge_raw in graph_data.links:
             edge = _as_edge(edge_raw)
             for endpoint in (edge.source, edge.target):
                 node_part, port_part = split_endpoint(endpoint)
@@ -394,11 +385,11 @@ def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> C
         def build_node(node_rec: _NodeRecord) -> Node:
             child_nodes: List[Node] = []
             child_edges: List[Edge] = []
-            if node_rec.input_node and (node_rec.input_node.nodes or node_rec.input_node.edges):
+            if node_rec.input_node and (node_rec.input_node.nodes or node_rec.input_node.links):
                 child_nodes, child_edges = build_scope(
                     MinimalGraphIn(
                         nodes=node_rec.input_node.nodes,
-                        edges=node_rec.input_node.edges,
+                        links=node_rec.input_node.links,
                     )
                 )
 
@@ -466,7 +457,7 @@ def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> C
 
         edge_ids: Dict[str, int] = {}
         scope_edges: List[Edge] = []
-        for edge_raw in graph_data.edges:
+        for edge_raw in graph_data.links:
             edge = _as_edge(edge_raw)
             sources: List[str] = []
             targets: List[str] = []
@@ -480,7 +471,7 @@ def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> C
                 port_id = ports[node_rec.id][port_key]["id"]
                 bucket.append(port_id)
 
-            edge_id_source = edge.id or edge.label or edge.name or _gen_id("edge")
+            edge_id_source = edge.id or edge.label or _gen_id("edge")
             base_edge_id = sanitize_id(edge_id_source)
             if base_edge_id in edge_ids:
                 edge_ids[base_edge_id] += 1
@@ -491,7 +482,7 @@ def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> C
 
             edge_type_norm = (edge.type or "").strip().lower()
             edge_defaults = edge_type_overrides_lc.get(edge_type_norm) or settings.edge_defaults
-            edge_label_text = edge.label or edge.name or edge_defaults.label.text
+            edge_label_text = edge.label or edge_defaults.label.text
             edge_label = EdgeLabel(
                 text=edge_label_text,
                 width=edge_defaults.label.width,

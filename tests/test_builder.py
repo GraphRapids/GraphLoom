@@ -68,11 +68,11 @@ def test_subgraph_dimensions_omitted_in_payload():
     minimal = MinimalGraphIn(
         nodes=[
             {
-                "l": "Cluster",
-                "nodes": [{"l": "A"}, {"l": "B"}],
+                "name": "Cluster",
+                "nodes": [{"name": "A"}, {"name": "B"}],
             }
         ],
-        edges=[],
+        links=[],
     )
     settings = sample_settings()
     canvas = build_canvas(minimal, settings)
@@ -90,12 +90,12 @@ def test_subgraph_type_overrides_explicit_input_type():
     minimal = MinimalGraphIn(
         nodes=[
             {
-                "l": "Cluster",
-                "t": "router",
-                "nodes": [{"l": "A"}],
+                "name": "Cluster",
+                "type": "router",
+                "nodes": [{"name": "A"}],
             }
         ],
-        edges=[],
+        links=[],
     )
     settings = sample_settings()
     canvas = build_canvas(minimal, settings)
@@ -103,10 +103,10 @@ def test_subgraph_type_overrides_explicit_input_type():
     assert canvas.children[0].type == "subgraph"
 
 
-def test_new_field_aliases_name_type_from_to():
+def test_canonical_name_type_from_to_fields():
     minimal = MinimalGraphIn(
         nodes=[{"name": "A"}, {"name": "B"}],
-        edges=[{"name": "link", "from": "A", "to": "B"}],
+        links=[{"label": "link", "from": "A", "to": "B"}],
     )
     settings = sample_settings()
     canvas = build_canvas(minimal, settings)
@@ -179,7 +179,7 @@ def test_name_length_constraints_for_node_port_and_edge():
             }
         )
 
-    with pytest.raises(ValidationError, match="Edge name must be between 1 and 40 characters"):
+    with pytest.raises(ValidationError, match="Extra inputs are not permitted"):
         MinimalGraphIn.model_validate(
             {
                 "nodes": ["A", "B"],
@@ -199,7 +199,18 @@ def test_graph_requires_at_least_one_node_or_link():
     MinimalGraphIn.model_validate({"links": [{"from": "A", "to": "B"}]})
 
 
-def test_links_alias_and_string_shorthand():
+def test_alias_fields_are_rejected():
+    with pytest.raises(ValidationError, match="Extra inputs are not permitted"):
+        MinimalGraphIn.model_validate({"nodes": [{"l": "A"}], "links": []})
+
+    with pytest.raises(ValidationError, match="Extra inputs are not permitted"):
+        MinimalGraphIn.model_validate({"nodes": [{"name": "A"}], "links": [{"a": "A", "b": "B"}]})
+
+    with pytest.raises(ValidationError, match="Extra inputs are not permitted"):
+        MinimalGraphIn.model_validate({"nodes": [{"name": "A"}], "edges": [{"from": "A", "to": "B"}]})
+
+
+def test_links_string_shorthand():
     minimal = MinimalGraphIn(
         nodes=["A", "B"],
         links=["A:eth0 -> B:eth1"],
@@ -212,10 +223,10 @@ def test_links_alias_and_string_shorthand():
     assert canvas.edges[0].labels[0].text == settings.edge_defaults.label.text
 
 
-def test_edge_label_prefers_label_field_over_name():
+def test_edge_id_derived_from_label():
     minimal = MinimalGraphIn(
         nodes=["A", "B"],
-        links=[{"name": "Legacy Name", "label": "Preferred Label", "from": "A", "to": "B"}],
+        links=[{"label": "Preferred Label", "from": "A", "to": "B"}],
     )
     settings = sample_settings()
     canvas = build_canvas(minimal, settings)
@@ -248,11 +259,11 @@ def test_role_defaults_apply_separately_for_subgraph_and_leaf_nodes():
     minimal = MinimalGraphIn(
         nodes=[
             {
-                "l": "Cluster",
-                "nodes": [{"l": "Leaf"}],
+                "name": "Cluster",
+                "nodes": [{"name": "Leaf"}],
             }
         ],
-        edges=[],
+        links=[],
     )
     settings = sample_settings()
     settings.node_defaults.label.width = 111
@@ -278,8 +289,8 @@ def test_subgraph_defaults_fallback_to_node_defaults_when_omitted():
     settings = ElkSettings.model_validate(raw)
 
     minimal = MinimalGraphIn(
-        nodes=[{"l": "Cluster", "nodes": [{"l": "Leaf"}]}],
-        edges=[],
+        nodes=[{"name": "Cluster", "nodes": [{"name": "Leaf"}]}],
+        links=[],
     )
     canvas = build_canvas(minimal, settings)
 
@@ -290,8 +301,8 @@ def test_subgraph_defaults_fallback_to_node_defaults_when_omitted():
 
 def test_icon_mapping():
     minimal = MinimalGraphIn(
-        nodes=[{"l": "FW1", "t": "firewall"}],
-        edges=[],
+        nodes=[{"name": "FW1", "type": "firewall"}],
+        links=[],
     )
     settings = sample_settings()
     canvas = build_canvas(minimal, settings)
@@ -300,8 +311,8 @@ def test_icon_mapping():
 
 def test_default_icon_none():
     minimal = MinimalGraphIn(
-        nodes=[{"l": "Node1"}],  # no type specified -> default
-        edges=[],
+        nodes=[{"name": "Node1"}],  # no type specified -> default
+        links=[],
     )
     settings = sample_settings()
     canvas = build_canvas(minimal, settings)
@@ -311,8 +322,8 @@ def test_default_icon_none():
 
 def test_node_to_node_edge_without_ports():
     minimal = MinimalGraphIn(
-        nodes=[{"l": "A"}, {"l": "B"}],
-        edges=[{"l": "link", "a": "A", "b": "B"}],  # no ports specified
+        nodes=[{"name": "A"}, {"name": "B"}],
+        links=[{"label": "link", "from": "A", "to": "B"}],  # no ports specified
     )
     settings = sample_settings()
     canvas = build_canvas(minimal, settings)
@@ -326,15 +337,15 @@ def test_node_to_node_edge_without_ports():
 def test_port_name_with_colons_is_rejected():
     with pytest.raises(ValidationError, match="Port name cannot contain ':'"):
         MinimalGraphIn(
-            nodes=[{"l": "Router1"}, {"l": "Router2"}],
-            edges=[{"l": "weird", "a": "Router1:Fo:1/0/0", "b": "Router2:Fo:2/0/0"}],
+            nodes=[{"name": "Router1"}, {"name": "Router2"}],
+            links=[{"label": "weird", "from": "Router1:Fo:1/0/0", "to": "Router2:Fo:2/0/0"}],
         )
 
 
 def test_icon_mapping_case_insensitive():
     minimal = MinimalGraphIn(
-        nodes=[{"l": "R1", "t": "Router"}],  # capitalized type
-        edges=[],
+        nodes=[{"name": "R1", "type": "Router"}],  # capitalized type
+        links=[],
     )
     settings = sample_settings()
     canvas = build_canvas(minimal, settings)
@@ -382,7 +393,7 @@ def test_yaml_input_loader():
 def test_layout_options_are_not_merged_into_node_properties():
     minimal = MinimalGraphIn(
         nodes=["A"],
-        edges=[],
+        links=[],
     )
     settings = sample_settings()
     settings.layout_options["org.eclipse.elk.nodeLabels.placement"] = "[OUTSIDE]"

@@ -1,25 +1,42 @@
 {
-    "nodes": [
+  "nodes": [
+    {
+      "name": "Subgraph 1",
+      "nodes": [
         {
-            "name": "Subgraph 1",
-            "nodes": [
-                {"name": "Node 1", "type": "router"},
-                {"name": "Node 2", "type": "switch"}
-            ],
-            "links": [
-                {
-                    "label": "Fabric 1",
-                    "type": "100G",
-                    "from": "Node 1:Hu0/0/0/0",
-                    "to": "Node 2:Hu0/0/0/0"
-                }
-            ]
+          "name": "Node 1",
+          "type": "router"
         },
-        {"name": "Node 3", "type": "router"},
-        {"name": "Node 4", "type": "firewall"}
-    ],
-    "links": [
-        {"label": "Uplink 1", "type": "MPLS", "from": "Subgraph 1", "to": "Node 3"},
-        "Node 3:eth0 -> Node 4:eth1"
-    ]
+        {
+          "name": "Node 2",
+          "type": "switch"
+        }
+      ],
+      "links": [
+        {
+          "label": "Fabric 1",
+          "type": "100G",
+          "from": "Node 1:Hu0/0/0/0",
+          "to": "Node 2:Hu0/0/0/0"
+        }
+      ]
+    },
+    {
+      "name": "Node 3",
+      "type": "router"
+    },
+    {
+      "name": "Node 4",
+      "type": "firewall"
+    }
+  ],
+  "links": [
+    {
+      "label": "Uplink 1",
+      "type": "MPLS",
+      "from": "Subgraph 1",
+      "to": "Node 3"
+    },
+    "Node 3:eth0 -> Node 4:eth1"
+  ]
 }

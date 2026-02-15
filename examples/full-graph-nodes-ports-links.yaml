@@ -1,15 +1,15 @@
 nodes:
-  - name: Core
-    type: router
-  - name: Edge
-    type: switch
-  - name: App
-    type: server
+- name: Core
+  type: router
+- name: Edge
+  type: switch
+- name: App
+  type: server
 links:
-  - label: Uplink
-    type: 10G
-    from: Core:ge0
-    to: Edge:ge1
-  - label: Access
-    from: Edge:eth0
-    to: App:eth0
+- label: Uplink
+  type: 10G
+  from: Core:ge0
+  to: Edge:ge1
+- label: Access
+  from: Edge:eth0
+  to: App:eth0
