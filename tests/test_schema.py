@@ -12,6 +12,18 @@ def test_minimal_input_schema_is_canonical_only_top_level():
 
     assert schema.get("additionalProperties") is False
     assert set(schema["properties"].keys()) == {"nodes", "links"}
+    assert "required" not in schema
+
+    assert schema.get("anyOf") == [
+        {
+            "required": ["nodes"],
+            "properties": {"nodes": {"minItems": 1}},
+        },
+        {
+            "required": ["links"],
+            "properties": {"links": {"minItems": 1}},
+        },
+    ]
 
 
 def test_minimal_input_schema_rejects_alias_keys_for_nodes_and_edges():

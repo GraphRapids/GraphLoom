@@ -187,6 +187,17 @@ def test_name_length_constraints_for_node_port_and_edge():
         )
 
 
+def test_graph_requires_at_least_one_node_or_link():
+    with pytest.raises(ValidationError, match="At least one node or one link must be defined"):
+        MinimalGraphIn.model_validate({})
+
+    with pytest.raises(ValidationError, match="At least one node or one link must be defined"):
+        MinimalGraphIn.model_validate({"nodes": [], "links": []})
+
+    MinimalGraphIn.model_validate({"nodes": ["A"]})
+    MinimalGraphIn.model_validate({"links": [{"from": "A", "to": "B"}]})
+
+
 def test_links_alias_and_string_shorthand():
     minimal = MinimalGraphIn(
         nodes=["A", "B"],

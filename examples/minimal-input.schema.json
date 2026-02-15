@@ -175,8 +175,27 @@
     }
   },
   "additionalProperties": false,
-  "required": [
-    "nodes"
+  "anyOf": [
+    {
+      "required": [
+        "nodes"
+      ],
+      "properties": {
+        "nodes": {
+          "minItems": 1
+        }
+      }
+    },
+    {
+      "required": [
+        "links"
+      ],
+      "properties": {
+        "links": {
+          "minItems": 1
+        }
+      }
+    }
   ],
   "title": "MinimalGraphIn",
   "type": "object"

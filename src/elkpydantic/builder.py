@@ -10,7 +10,7 @@ try:  # Python 3.11+
 except ImportError:  # pragma: no cover
     import tomli as tomllib  # type: ignore
 
-from pydantic import AliasChoices, BaseModel, ConfigDict, Field, field_validator
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from .canvas import Canvas
 from .options import (
@@ -150,7 +150,7 @@ class MinimalEdgeIn(BaseModel):
 class MinimalGraphIn(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    nodes: List[MinimalNodeIn | str]
+    nodes: List[MinimalNodeIn | str] = Field(default_factory=list)
     edges: List[MinimalEdgeIn | str] = Field(
         default_factory=list,
         alias="links",
@@ -180,6 +180,12 @@ class MinimalGraphIn(BaseModel):
         if not isinstance(v, list):
             return v
         return [_normalize_edge_entry(edge) for edge in v]
+
+    @model_validator(mode="after")
+    def validate_non_empty_graph(self) -> "MinimalGraphIn":
+        if not self.nodes and not self.edges:
+            raise ValueError("At least one node or one link must be defined.")
+        return self
 
 
 MinimalNodeIn.model_rebuild()
