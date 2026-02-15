@@ -125,7 +125,7 @@ laid_out = layout_with_elkjs(payload, mode="node")
   - Port name in `node:port`: min 1, max 15 chars.
   - Edge label/name (when provided): min 1, max 40 chars.
 Unknown nodes referenced in edges are auto-created when `auto_create_missing_nodes` is true (default).
-- JSON Schema: `examples/minimal-input.schema.json`
+- JSON Schema (bundled): `src/elkpydantic/schemas/minimal-input.schema.json`
 
 Backwards-compatible aliases are accepted for input:
 - node: `l` -> `name`, `t` -> `type`

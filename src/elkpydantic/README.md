@@ -12,4 +12,5 @@ Short explanation of each item in this folder:
 - `node.py`: Node and node-label models with validation rules (leaf vs subgraph sizing, unique IDs).
 - `options.py`: Typed ELK layout option models and parsing/serialization helpers.
 - `port.py`: Port and port-label models.
+- `schemas/`: Bundled JSON Schemas shipped with the package (for example minimal input schema).
 - `settings.py`: Settings/defaults models and built-in sample settings.

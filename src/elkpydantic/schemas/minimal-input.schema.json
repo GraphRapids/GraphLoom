@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/Faerkeren/ElkPydantic/examples/minimal-input.schema.json",
+  "$id": "https://raw.githubusercontent.com/Faerkeren/ElkPydantic/main/src/elkpydantic/schemas/minimal-input.schema.json",
   "description": "Schema for ElkPydantic minimal graph input (canonical syntax only).",
   "$defs": {
     "MinimalEdgeIn": {
