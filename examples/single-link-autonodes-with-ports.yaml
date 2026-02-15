@@ -1,0 +1,3 @@
+links:
+  - from: Alpha:eth0
+    to: Beta:eth1

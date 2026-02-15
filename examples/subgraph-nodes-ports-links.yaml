@@ -1,0 +1,17 @@
+nodes:
+  - name: Fabric
+    nodes:
+      - name: LeafA
+        type: switch
+      - name: LeafB
+        type: switch
+    links:
+      - label: Spine
+        from: LeafA:ge0
+        to: LeafB:ge0
+  - name: Edge
+    type: router
+links:
+  - label: Uplink
+    from: Fabric
+    to: Edge
