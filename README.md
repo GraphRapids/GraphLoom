@@ -1,5 +1,5 @@
 # GraphLoom
-Enrich minimal graph JSON into fully-formed [ELK](https://www.eclipse.org/elk/) JSON using Pydantic.  
+Enrich minimal graph JSON/YAML into fully-formed [ELK](https://www.eclipse.org/elk/) JSON using Pydantic.  
 Focus: keep authoring input tiny; derive ports/nodes from edges; centralize defaults in settings.
 
 ## What it does
