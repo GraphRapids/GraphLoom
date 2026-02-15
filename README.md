@@ -133,7 +133,7 @@ Only canonical keys are supported:
 
 ## Settings (TOML/JSON or env)
 See `examples/example.settings.toml`
-- `layout_options`: emitted only at root `layoutOptions`; may include any recognized ELK option key (including inherited defaults like `org.eclipse.elk.nodeSize.*`).
+- `layout_options`: emitted only at root `layoutOptions`; may include any recognized ELK option key (including inherited defaults like `org.eclipse.elk.nodeSize.*` and `org.eclipse.elk.portConstraints`).
 - `node_defaults`: defaults for leaf nodes; sizes, label defaults, port defaults, properties; `type="default"`, `icon=""` (None).
 - `subgraph_defaults`: defaults for subgraph nodes (nodes with children). `width`/`height` are optional and ignored for subgraphs.
 - `edge_defaults`: label defaults and properties.

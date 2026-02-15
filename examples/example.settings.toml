@@ -2,6 +2,7 @@
 
 [layout_options]
 org.eclipse.elk.algorithm = "layered"
+org.eclipse.elk.portConstraints = "FREE"
 org.eclipse.elk.nodeSize.constraints = "MINIMUM_SIZE"
 org.eclipse.elk.nodeSize.options = "[DEFAULT_MINIMUM_SIZE,COMPUTE_PADDING,MINIMUM_SIZE_ACCOUNTS_FOR_PADDING]"
 org.eclipse.elk.hierarchyHandling = "INCLUDE_CHILDREN"

@@ -404,3 +404,17 @@ def test_layout_options_are_not_merged_into_node_properties():
 
     assert payload["layoutOptions"]["org.eclipse.elk.nodeLabels.placement"] == "[OUTSIDE]"
     assert "org.eclipse.elk.nodeLabels.placement" not in payload["children"][0]["properties"]
+
+
+def test_canvas_layout_options_accept_port_constraints():
+    minimal = MinimalGraphIn(
+        nodes=["A"],
+        links=[],
+    )
+    settings = sample_settings()
+    settings.layout_options["org.eclipse.elk.portConstraints"] = "FREE"
+
+    canvas = build_canvas(minimal, settings)
+    payload = canvas.model_dump(by_alias=True, exclude_none=True, mode="json")
+
+    assert payload["layoutOptions"]["org.eclipse.elk.portConstraints"] == "FREE"

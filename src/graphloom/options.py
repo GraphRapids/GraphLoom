@@ -526,4 +526,8 @@ class LabelLayoutOptions(_LayoutOptionsBase):
 
 
 class LayoutOptions(ParentLayoutOptions):
+    org_eclipse_elk_portConstraints: Optional[PortConstraints] = Field(
+        default=None,
+        alias="org.eclipse.elk.portConstraints",
+    )
     model_config = {"extra": "allow", "populate_by_name": True}
