@@ -28,6 +28,20 @@ from .node import Node, NodeLabel
 from .port import Port, PortLabel
 from .settings import ElkSettings, sample_settings
 
+NODE_NAME_MIN_LENGTH = 1
+NODE_NAME_MAX_LENGTH = 20
+PORT_NAME_MIN_LENGTH = 1
+PORT_NAME_MAX_LENGTH = 15
+EDGE_NAME_MIN_LENGTH = 1
+EDGE_NAME_MAX_LENGTH = 40
+
+
+def _validate_length(value: str, *, field_name: str, min_len: int, max_len: int) -> str:
+    length = len(value)
+    if length < min_len or length > max_len:
+        raise ValueError(f"{field_name} must be between {min_len} and {max_len} characters.")
+    return value
+
 
 class MinimalNodeIn(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
@@ -66,6 +80,20 @@ class MinimalNodeIn(BaseModel):
             return v
         return [_normalize_edge_entry(edge) for edge in v]
 
+    @field_validator("name")
+    @classmethod
+    def validate_name(cls, value: str) -> str:
+        if ":" in value:
+            raise ValueError(
+                "Node name cannot contain ':' because edge endpoints use 'node:port' syntax."
+            )
+        return _validate_length(
+            value,
+            field_name="Node name",
+            min_len=NODE_NAME_MIN_LENGTH,
+            max_len=NODE_NAME_MAX_LENGTH,
+        )
+
 
 class MinimalEdgeIn(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
@@ -82,6 +110,41 @@ class MinimalEdgeIn(BaseModel):
         validation_alias=AliasChoices("to", "b"),
         serialization_alias="to",
     )
+
+    @field_validator("name", "label")
+    @classmethod
+    def validate_edge_name(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        return _validate_length(
+            value,
+            field_name="Edge name",
+            min_len=EDGE_NAME_MIN_LENGTH,
+            max_len=EDGE_NAME_MAX_LENGTH,
+        )
+
+    @field_validator("source", "target")
+    @classmethod
+    def validate_endpoint(cls, value: str) -> str:
+        node_part, port_part = split_endpoint(value)
+        _validate_length(
+            node_part,
+            field_name="Node name",
+            min_len=NODE_NAME_MIN_LENGTH,
+            max_len=NODE_NAME_MAX_LENGTH,
+        )
+        if port_part is not None:
+            if ":" in port_part:
+                raise ValueError(
+                    "Port name cannot contain ':' because edge endpoints use 'node:port' syntax."
+                )
+            _validate_length(
+                port_part,
+                field_name="Port name",
+                min_len=PORT_NAME_MIN_LENGTH,
+                max_len=PORT_NAME_MAX_LENGTH,
+            )
+        return value
 
 
 class MinimalGraphIn(BaseModel):

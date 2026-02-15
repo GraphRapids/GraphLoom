@@ -20,6 +20,8 @@
         "label": {
           "anyOf": [
             {
+              "maxLength": 40,
+              "minLength": 1,
               "type": "string"
             },
             {
@@ -42,10 +44,16 @@
           "title": "Type"
         },
         "from": {
+          "maxLength": 36,
+          "minLength": 1,
+          "pattern": "^[^:]{1,20}(:[^:]{1,15})?$",
           "title": "From",
           "type": "string"
         },
         "to": {
+          "maxLength": 36,
+          "minLength": 1,
+          "pattern": "^[^:]{1,20}(:[^:]{1,15})?$",
           "title": "To",
           "type": "string"
         }
@@ -61,6 +69,9 @@
     "MinimalNodeIn": {
       "properties": {
         "name": {
+          "maxLength": 20,
+          "minLength": 1,
+          "pattern": "^[^:]*$",
           "title": "Name",
           "type": "string"
         },
@@ -95,6 +106,9 @@
                 "$ref": "#/$defs/MinimalNodeIn"
               },
               {
+                "maxLength": 20,
+                "minLength": 1,
+                "pattern": "^[^:]*$",
                 "type": "string"
               }
             ]
@@ -109,6 +123,7 @@
                 "$ref": "#/$defs/MinimalEdgeIn"
               },
               {
+                "pattern": "^\\s*[^:]{1,20}(:[^:]{1,15})?\\s*->\\s*[^:]{1,20}(:[^:]{1,15})?\\s*$",
                 "type": "string"
               }
             ]
@@ -133,6 +148,9 @@
             "$ref": "#/$defs/MinimalNodeIn"
           },
           {
+            "maxLength": 20,
+            "minLength": 1,
+            "pattern": "^[^:]*$",
             "type": "string"
           }
         ]
@@ -147,6 +165,7 @@
             "$ref": "#/$defs/MinimalEdgeIn"
           },
           {
+            "pattern": "^\\s*[^:]{1,20}(:[^:]{1,15})?\\s*->\\s*[^:]{1,20}(:[^:]{1,15})?\\s*$",
             "type": "string"
           }
         ]

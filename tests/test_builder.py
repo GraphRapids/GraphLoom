@@ -1,3 +1,6 @@
+import pytest
+from pydantic import ValidationError
+
 from elkpydantic.builder import MinimalGraphIn, build_canvas
 from elkpydantic.settings import ElkSettings, sample_settings
 
@@ -109,6 +112,79 @@ def test_new_field_aliases_name_type_from_to():
 
     assert canvas.edges[0].sources == ["a"]
     assert canvas.edges[0].targets == ["b"]
+
+
+def test_node_name_rejects_colon():
+    with pytest.raises(ValidationError, match="Node name cannot contain ':'"):
+        MinimalGraphIn.model_validate(
+            {
+                "nodes": [{"name": "A:B"}],
+                "links": [],
+            }
+        )
+
+    with pytest.raises(ValidationError, match="Node name cannot contain ':'"):
+        MinimalGraphIn.model_validate(
+            {
+                "nodes": ["A:B"],
+                "links": [],
+            }
+        )
+
+
+def test_name_length_constraints_for_node_port_and_edge():
+    MinimalGraphIn.model_validate(
+        {
+            "nodes": [{"name": "N" * 20}, {"name": "B"}],
+            "links": [{"label": "E" * 40, "from": "N" * 20, "to": "B:" + ("p" * 15)}],
+        }
+    )
+
+    with pytest.raises(ValidationError, match="Node name must be between 1 and 20 characters"):
+        MinimalGraphIn.model_validate({"nodes": [{"name": ""}], "links": []})
+
+    with pytest.raises(ValidationError, match="Node name must be between 1 and 20 characters"):
+        MinimalGraphIn.model_validate({"nodes": [{"name": "N" * 21}], "links": []})
+
+    with pytest.raises(ValidationError, match="Port name must be between 1 and 15 characters"):
+        MinimalGraphIn.model_validate(
+            {
+                "nodes": ["A", "B"],
+                "links": [{"from": "A:" + ("p" * 16), "to": "B"}],
+            }
+        )
+
+    with pytest.raises(ValidationError, match="Port name must be between 1 and 15 characters"):
+        MinimalGraphIn.model_validate(
+            {
+                "nodes": ["A", "B"],
+                "links": [{"from": "A:", "to": "B"}],
+            }
+        )
+
+    with pytest.raises(ValidationError, match="Edge name must be between 1 and 40 characters"):
+        MinimalGraphIn.model_validate(
+            {
+                "nodes": ["A", "B"],
+                "links": [{"label": "", "from": "A", "to": "B"}],
+            }
+        )
+
+    with pytest.raises(ValidationError, match="Edge name must be between 1 and 40 characters"):
+        MinimalGraphIn.model_validate(
+            {
+                "nodes": ["A", "B"],
+                "links": [{"label": "E" * 41, "from": "A", "to": "B"}],
+            }
+        )
+
+    with pytest.raises(ValidationError, match="Edge name must be between 1 and 40 characters"):
+        MinimalGraphIn.model_validate(
+            {
+                "nodes": ["A", "B"],
+                "links": [{"name": "E" * 41, "from": "A", "to": "B"}],
+            }
+        )
 
 
 def test_links_alias_and_string_shorthand():
@@ -235,17 +311,12 @@ def test_node_to_node_edge_without_ports():
     assert canvas.edges[0].targets == [canvas.children[1].id]
 
 
-def test_port_name_with_colons():
-    minimal = MinimalGraphIn(
-        nodes=[{"l": "Router1"}, {"l": "Router2"}],
-        edges=[{"l": "weird", "a": "Router1:Fo:1/0/0", "b": "Router2:Fo:2/0/0"}],
-    )
-    settings = sample_settings()
-    canvas = build_canvas(minimal, settings)
-
-    # Port ids should include sanitized portion after first colon only
-    assert canvas.edges[0].sources[0] == "router1_fo_1_0_0"
-    assert canvas.edges[0].targets[0] == "router2_fo_2_0_0"
+def test_port_name_with_colons_is_rejected():
+    with pytest.raises(ValidationError, match="Port name cannot contain ':'"):
+        MinimalGraphIn(
+            nodes=[{"l": "Router1"}, {"l": "Router2"}],
+            edges=[{"l": "weird", "a": "Router1:Fo:1/0/0", "b": "Router2:Fo:2/0/0"}],
+        )
 
 
 def test_icon_mapping_case_insensitive():

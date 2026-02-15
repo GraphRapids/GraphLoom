@@ -117,10 +117,13 @@ laid_out = layout_with_elkjs(payload, mode="node")
 ## Minimal input schema
 - **nodes[]**: either a string (`"Node 1"`) or `{ "name": "<label>", "type": "<type>", "id": "<optional custom id>", "nodes": [ ... ], "links": [ ... ] }`
   - `nodes` and `links` on a node define a recursive subgraph scope.
+  - Node `name`: min 1, max 20 chars, and must not contain `:` (edge endpoint syntax uses `node:port`).
   - Subgraph nodes are emitted without `width`/`height`, and carry nested `children` + `edges` in output.
 - **links[] / edges[]**: each item can be:
   - string shorthand: `"Node A:eth0 -> Node B:eth1"`
   - object: `{ "label": "<optional edge label>", "type": "<optional link type>", "from": "Node:Port", "to": "Node:Port" }`
+  - Port name in `node:port`: min 1, max 15 chars.
+  - Edge label/name (when provided): min 1, max 40 chars.
 Unknown nodes referenced in edges are auto-created when `auto_create_missing_nodes` is true (default).
 - JSON Schema: `examples/minimal-input.schema.json`
 
