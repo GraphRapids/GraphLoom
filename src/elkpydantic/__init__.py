@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from .canvas import Canvas
 from .base import Properties
 from .enums import (
@@ -23,9 +27,11 @@ from .options import (
 )
 from .port import Port, PortLabel
 from .edge import Edge,EdgeLabel
-from .builder import MinimalGraphIn, MinimalEdgeIn, MinimalNodeIn, build_canvas, sanitize_id
-from .elkjs import layout_with_elkjs
 from .settings import ElkSettings, sample_settings
+
+if TYPE_CHECKING:  # pragma: no cover
+    from .builder import MinimalGraphIn, MinimalEdgeIn, MinimalNodeIn, build_canvas, sanitize_id
+    from .elkjs import layout_with_elkjs
 
 __all__ = [
     "Node",
@@ -61,3 +67,15 @@ __all__ = [
     "ElkSettings",
     "sample_settings",
 ]
+
+
+def __getattr__(name: str):
+    if name in {"MinimalGraphIn", "MinimalEdgeIn", "MinimalNodeIn", "build_canvas", "sanitize_id"}:
+        from . import builder as _builder
+
+        return getattr(_builder, name)
+    if name == "layout_with_elkjs":
+        from . import elkjs as _elkjs
+
+        return _elkjs.layout_with_elkjs
+    raise AttributeError(f"module 'elkpydantic' has no attribute '{name}'")

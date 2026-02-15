@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Faerkeren/ElkPydantic/examples/minimal-input.schema.json",
-  "description": "Schema for ElkPydantic minimal graph input.",
+  "description": "Schema for ElkPydantic minimal graph input (canonical syntax only).",
   "$defs": {
     "MinimalEdgeIn": {
       "properties": {
@@ -16,18 +16,6 @@
           ],
           "default": null,
           "title": "Id"
-        },
-        "name": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "Name"
         },
         "label": {
           "anyOf": [
@@ -66,6 +54,7 @@
         "from",
         "to"
       ],
+      "additionalProperties": false,
       "title": "MinimalEdgeIn",
       "type": "object"
     },
@@ -131,6 +120,7 @@
       "required": [
         "name"
       ],
+      "additionalProperties": false,
       "title": "MinimalNodeIn",
       "type": "object"
     }
@@ -165,6 +155,7 @@
       "type": "array"
     }
   },
+  "additionalProperties": false,
   "required": [
     "nodes"
   ],

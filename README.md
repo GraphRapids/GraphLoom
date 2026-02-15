@@ -71,7 +71,7 @@ minimal = MinimalGraphIn.model_validate({
     ],
     "links": [{"label": "Uplink 1", "type": "MPLS", "from": "Subgraph 1", "to": "Node 3"}],
 })
-settings = sample_settings()  # or ElkSettings.model_validate_file(...)
+settings = sample_settings()  # or ElkSettings.model_validate(your_settings_dict)
 canvas = build_canvas(minimal, settings)
 elk_json = canvas.model_dump_json(indent=2, by_alias=True)
 ```
@@ -127,10 +127,12 @@ Unknown nodes referenced in edges are auto-created when `auto_create_missing_nod
 Backwards-compatible aliases are accepted for input:
 - node: `l` -> `name`, `t` -> `type`
 - edge: `l`/`name` -> `label`, `t` -> `type`, `a` -> `from`, `b` -> `to`
+The JSON Schema validates canonical keys only (`nodes`/`links`, `name`/`type`, `label`/`from`/`to`) and intentionally rejects alias forms.
+When validating against schema, prefer top-level `links` (not `edges`) and canonical edge fields (`label`, `from`, `to`).
 
 ## Settings (TOML/JSON or env)
 See `examples/example.settings.toml`
-- `layout_options`: canvas-level ELK keys only (for root `layoutOptions`), e.g. `org.eclipse.elk.algorithm`.
+- `layout_options`: emitted only at root `layoutOptions`; may include any recognized ELK option key (including inherited defaults like `org.eclipse.elk.nodeSize.*`).
 - `node_defaults`: defaults for leaf nodes; sizes, label defaults, port defaults, properties; `type="default"`, `icon=""` (None).
 - `subgraph_defaults`: defaults for subgraph nodes (nodes with children). `width`/`height` are optional and ignored for subgraphs.
 - `edge_defaults`: label defaults and properties.

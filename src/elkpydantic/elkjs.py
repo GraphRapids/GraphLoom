@@ -5,6 +5,8 @@ import subprocess
 from pathlib import Path
 from typing import Any, Dict
 
+_ELKJS_NPM_SPEC = "elkjs@0.11.0"
+
 _ELKJS_LAYOUT_SCRIPT = r"""
 const fs = require('fs');
 
@@ -39,6 +41,24 @@ def _elkjs_command(mode: str, node_cmd: str) -> list[str]:
     raise ValueError(f"Unsupported elkjs mode '{mode}'. Use 'node', 'npm', or 'npx'.")
 
 
+def _expected_elkjs_version() -> str:
+    if "@" not in _ELKJS_NPM_SPEC:
+        return ""
+    return _ELKJS_NPM_SPEC.split("@", 1)[1]
+
+
+def _installed_elkjs_version(module_dir: Path) -> str:
+    package_json = module_dir / "package.json"
+    if not package_json.exists():
+        return ""
+    try:
+        data = json.loads(package_json.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return ""
+    version = data.get("version")
+    return str(version) if version else ""
+
+
 def _ensure_elkjs_npm_workspace() -> Path:
     workspace = Path.home() / ".cache" / "elkpydantic" / "elkjs"
     workspace.mkdir(parents=True, exist_ok=True)
@@ -59,12 +79,13 @@ def _ensure_elkjs_npm_workspace() -> Path:
         )
 
     module_dir = workspace / "node_modules" / "elkjs"
-    if module_dir.exists():
+    expected_version = _expected_elkjs_version()
+    if module_dir.exists() and _installed_elkjs_version(module_dir) == expected_version:
         return workspace
 
     try:
         proc = subprocess.run(
-            ["npm", "install", "--no-fund", "--no-audit", "elkjs"],
+            ["npm", "install", "--no-fund", "--no-audit", _ELKJS_NPM_SPEC],
             cwd=str(workspace),
             capture_output=True,
             text=True,
@@ -80,6 +101,19 @@ def _ensure_elkjs_npm_workspace() -> Path:
         )
 
     return workspace
+
+
+def _strip_elkjs_internal_fields(value: Any) -> Any:
+    if isinstance(value, dict):
+        cleaned: Dict[str, Any] = {}
+        for key, item in value.items():
+            if isinstance(key, str) and key.startswith("$"):
+                continue
+            cleaned[key] = _strip_elkjs_internal_fields(item)
+        return cleaned
+    if isinstance(value, list):
+        return [_strip_elkjs_internal_fields(item) for item in value]
+    return value
 
 
 def layout_with_elkjs(
@@ -125,6 +159,7 @@ def layout_with_elkjs(
         )
 
     try:
-        return json.loads(proc.stdout)
+        raw = json.loads(proc.stdout)
     except json.JSONDecodeError as exc:
         raise RuntimeError("elkjs returned non-JSON output.") from exc
+    return _strip_elkjs_internal_fields(raw)
