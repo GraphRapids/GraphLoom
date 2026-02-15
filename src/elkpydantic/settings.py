@@ -82,7 +82,8 @@ def sample_settings() -> ElkSettings:
             "layout_options": {
                 "org.eclipse.elk.algorithm": "layered",
                 "org.eclipse.elk.nodeSize.constraints": "MINIMUM_SIZE",
-                "org.eclipse.elk.nodeSize.options": "DEFAULT_MINIMUM_SIZE",
+                "org.eclipse.elk.nodeSize.options": "[DEFAULT_MINIMUM_SIZE,COMPUTE_PADDING,MINIMUM_SIZE_ACCOUNTS_FOR_PADDING]",
+                "org.eclipse.elk.hierarchyHandling": "INCLUDE_CHILDREN",
                 "org.eclipse.elk.layered.layering.strategy": "NETWORK_SIMPLEX",
                 "org.eclipse.elk.aspectRatio": "1.414",
                 "org.eclipse.elk.zoomToFit": True,
