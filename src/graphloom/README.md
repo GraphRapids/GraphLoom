@@ -1,4 +1,4 @@
-# elkpydantic package files
+# graphloom package files
 
 Short explanation of each item in this folder:
 

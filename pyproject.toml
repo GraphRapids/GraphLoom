@@ -3,7 +3,7 @@ requires = ["setuptools>=69", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "elkpydantic"
+name = "graphloom"
 version = "0.1.0"
 description = "Enriches minimal JSON input to valid ELK JSON output"
 readme = "README.md"
@@ -27,9 +27,9 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/Faerkeren/ElkPydantic"
-Repository = "https://github.com/Faerkeren/ElkPydantic"
-Issues = "https://github.com/Faerkeren/ElkPydantic/issues"
+Homepage = "https://github.com/Faerkeren/GraphLoom"
+Repository = "https://github.com/Faerkeren/GraphLoom"
+Issues = "https://github.com/Faerkeren/GraphLoom/issues"
 
 [project.optional-dependencies]
 dev = [
@@ -43,9 +43,9 @@ package-dir = {"" = "src"}
 where = ["src"]
 
 [tool.setuptools.package-data]
-elkpydantic = [
+graphloom = [
     "schemas/*.json",
 ]
 
 [project.scripts]
-elkpydantic = "elkpydantic.builder:main"
+graphloom = "graphloom.builder:main"

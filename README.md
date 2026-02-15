@@ -1,4 +1,4 @@
-# ElkPydantic
+# GraphLoom
 Enrich minimal graph JSON into fully-formed [ELK](https://www.eclipse.org/elk/) JSON using Pydantic.  
 Focus: keep authoring input tiny; derive ports/nodes from edges; centralize defaults in settings.
 
@@ -21,30 +21,30 @@ pip install -e .
 ## CLI usage
 ```bash
 # Using installed console script
-elkpydantic examples/example_01.json \
+graphloom examples/example_01.json \
   -s examples/example.settings.toml \
   -o /tmp/elk.json
 
 # YAML input works too
-elkpydantic examples/example_01.yaml \
+graphloom examples/example_01.yaml \
   -s examples/example.settings.toml \
   -o /tmp/elk.json
 
 # Or directly
-python -m elkpydantic.builder examples/example_01.json -s examples/example.settings.toml
+python -m graphloom.builder examples/example_01.json -s examples/example.settings.toml
 
 # Run local elkjs layout (requires Node.js + elkjs available to node)
-elkpydantic examples/example_01.yaml \
+graphloom examples/example_01.yaml \
   -s examples/example.settings.toml \
   --layout
 
-# Auto-install elkjs into a local npm cache (~/.cache/elkpydantic/elkjs)
-elkpydantic examples/example_01.yaml \
+# Auto-install elkjs into a local npm cache (~/.cache/graphloom/elkjs)
+graphloom examples/example_01.yaml \
   -s examples/example.settings.toml \
   --layout --elkjs-mode npm
 
 # npx is kept as an alias of npm mode
-elkpydantic examples/example_01.yaml \
+graphloom examples/example_01.yaml \
   -s examples/example.settings.toml \
   --layout --elkjs-mode npx
 ```
@@ -58,7 +58,7 @@ Flags:
 
 ## Library usage
 ```python
-from elkpydantic import MinimalGraphIn, build_canvas, sample_settings
+from graphloom import MinimalGraphIn, build_canvas, sample_settings
 
 minimal = MinimalGraphIn.model_validate({
     "nodes": [
@@ -82,7 +82,7 @@ from pathlib import Path
 
 import yaml
 
-from elkpydantic import MinimalGraphIn, build_canvas, sample_settings
+from graphloom import MinimalGraphIn, build_canvas, sample_settings
 
 yaml_path = Path("examples/example_01.yaml")
 raw = yaml.safe_load(yaml_path.read_text(encoding="utf-8")) or {}
@@ -97,7 +97,7 @@ elk_json = canvas.model_dump_json(indent=2, by_alias=True)
 
 ### Library usage with local elkjs layout
 ```python
-from elkpydantic import MinimalGraphIn, build_canvas, layout_with_elkjs, sample_settings
+from graphloom import MinimalGraphIn, build_canvas, layout_with_elkjs, sample_settings
 
 minimal = MinimalGraphIn.model_validate({
     "nodes": ["A", "B"],
@@ -110,7 +110,7 @@ payload = canvas.model_dump(by_alias=True, exclude_none=True)
 # mode="node": requires elkjs installed for local node runtime
 laid_out = layout_with_elkjs(payload, mode="node")
 
-# mode="npm": auto-installs elkjs into ~/.cache/elkpydantic/elkjs when missing
+# mode="npm": auto-installs elkjs into ~/.cache/graphloom/elkjs when missing
 # laid_out = layout_with_elkjs(payload, mode="npm")
 ```
 
@@ -125,7 +125,7 @@ laid_out = layout_with_elkjs(payload, mode="node")
   - Port name in `node:port`: min 1, max 15 chars.
   - Edge label/name (when provided): min 1, max 40 chars.
 Unknown nodes referenced in edges are auto-created when `auto_create_missing_nodes` is true (default).
-- JSON Schema (bundled): `src/elkpydantic/schemas/minimal-input.schema.json`
+- JSON Schema (bundled): `src/graphloom/schemas/minimal-input.schema.json`
 
 Backwards-compatible aliases are accepted for input:
 - node: `l` -> `name`, `t` -> `type`
@@ -162,4 +162,4 @@ Default type is `default` with no icon; mapping wins when present, otherwise ove
 
 ## Development
 - Run tests: `. .venv/bin/activate && pytest -q`
-- Example run: `elkpydantic examples/example_01.yaml -s examples/example.settings.toml`
+- Example run: `graphloom examples/example_01.yaml -s examples/example.settings.toml`

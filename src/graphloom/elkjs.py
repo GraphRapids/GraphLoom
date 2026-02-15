@@ -60,7 +60,7 @@ def _installed_elkjs_version(module_dir: Path) -> str:
 
 
 def _ensure_elkjs_npm_workspace() -> Path:
-    workspace = Path.home() / ".cache" / "elkpydantic" / "elkjs"
+    workspace = Path.home() / ".cache" / "graphloom" / "elkjs"
     workspace.mkdir(parents=True, exist_ok=True)
 
     package_json = workspace / "package.json"
@@ -68,9 +68,9 @@ def _ensure_elkjs_npm_workspace() -> Path:
         package_json.write_text(
             json.dumps(
                 {
-                    "name": "elkpydantic-elkjs-cache",
+                    "name": "graphloom-elkjs-cache",
                     "private": True,
-                    "description": "Local cache used by elkpydantic for elkjs layout.",
+                    "description": "Local cache used by graphloom for elkjs layout.",
                 },
                 indent=2,
             )
@@ -126,7 +126,7 @@ def layout_with_elkjs(
 
     mode:
       - "node": requires elkjs to be available to the local node runtime.
-      - "npm": auto-installs elkjs into ~/.cache/elkpydantic/elkjs when missing.
+      - "npm": auto-installs elkjs into ~/.cache/graphloom/elkjs when missing.
       - "npx": alias of "npm".
     """
     cmd = _elkjs_command(mode, node_cmd)

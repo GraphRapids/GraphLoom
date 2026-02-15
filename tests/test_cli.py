@@ -4,7 +4,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-import elkpydantic.builder as builder_mod
+import graphloom.builder as builder_mod
 
 
 def _write_minimal_input(path: Path) -> None:
@@ -17,7 +17,7 @@ def _write_minimal_input(path: Path) -> None:
 
 def _load_dev_main_module():
     module_path = Path("main.py").resolve()
-    spec = importlib.util.spec_from_file_location("elkpydantic_dev_main", module_path)
+    spec = importlib.util.spec_from_file_location("graphloom_dev_main", module_path)
     assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
@@ -96,7 +96,7 @@ def test_python_module_invocation_has_no_runtime_warning(tmp_path):
         [
             sys.executable,
             "-m",
-            "elkpydantic.builder",
+            "graphloom.builder",
             str(input_path),
             "-o",
             str(output_path),

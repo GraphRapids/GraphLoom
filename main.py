@@ -4,7 +4,7 @@ Run:
     python main.py examples/example_01.yaml -s examples/example.settings.toml -o /tmp/elk.json
 """
 
-from elkpydantic.builder import main as _builder_main
+from graphloom.builder import main as _builder_main
 
 
 def main(argv: list[str] | None = None) -> int:

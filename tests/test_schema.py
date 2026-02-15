@@ -3,7 +3,7 @@ from importlib import resources
 
 
 def _load_schema() -> dict:
-    schema_text = resources.files("elkpydantic").joinpath(
+    schema_text = resources.files("graphloom").joinpath(
         "schemas/minimal-input.schema.json"
     ).read_text(encoding="utf-8")
     return json.loads(schema_text)

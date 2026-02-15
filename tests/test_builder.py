@@ -1,8 +1,8 @@
 import pytest
 from pydantic import ValidationError
 
-from elkpydantic.builder import MinimalGraphIn, build_canvas
-from elkpydantic.settings import ElkSettings, sample_settings
+from graphloom.builder import MinimalGraphIn, build_canvas
+from graphloom.settings import ElkSettings, sample_settings
 
 
 def load_sample() -> MinimalGraphIn:
@@ -342,7 +342,7 @@ def test_icon_mapping_case_insensitive():
 
 
 def test_toml_properties_are_flattened():
-    from elkpydantic.builder import _load_settings
+    from graphloom.builder import _load_settings
 
     settings = _load_settings("examples/example.settings.toml")
 
@@ -369,7 +369,7 @@ def test_toml_properties_are_flattened():
 
 
 def test_yaml_input_loader():
-    from elkpydantic.builder import _load_input
+    from graphloom.builder import _load_input
 
     data = _load_input("examples/example_01.yaml")
     settings = sample_settings()

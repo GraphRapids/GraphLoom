@@ -78,4 +78,4 @@ def __getattr__(name: str):
         from . import elkjs as _elkjs
 
         return _elkjs.layout_with_elkjs
-    raise AttributeError(f"module 'elkpydantic' has no attribute '{name}'")
+    raise AttributeError(f"module 'graphloom' has no attribute '{name}'")
