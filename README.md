@@ -1,4 +1,6 @@
 # GraphLoom
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 Enrich minimal graph JSON/YAML into fully-formed [ELK](https://www.eclipse.org/elk/) JSON using Pydantic.  
 Focus: keep authoring input tiny; derive ports/nodes from edges; centralize defaults in settings.
 

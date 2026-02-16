@@ -7,7 +7,6 @@ estimate_label_size_from_font = true
 org.eclipse.elk.algorithm = "layered"
 org.eclipse.elk.layered.layering.strategy = "NETWORK_SIMPLEX"
 org.eclipse.elk.layered.nodePlacement.strategy = "NETWORK_SIMPLEX"
-#org.eclipse.elk.layered.considerModelOrder.strategy = "NODES_AND_EDGES"
 org.eclipse.elk.portConstraints = "FREE"
 org.eclipse.elk.nodeSize.constraints = "MINIMUM_SIZE"
 org.eclipse.elk.nodeSize.options = "[DEFAULT_MINIMUM_SIZE,COMPUTE_PADDING,MINIMUM_SIZE_ACCOUNTS_FOR_PADDING]"
@@ -16,10 +15,13 @@ org.eclipse.elk.aspectRatio = "1.414"
 org.eclipse.elk.zoomToFit = true
 org.eclipse.elk.direction = "RIGHT"
 org.eclipse.elk.padding = "[top=60,left=60,bottom=60,right=60]"
-#org.eclipse.elk.spacing.labelPortHorizontal = 3
-#org.eclipse.elk.spacing.labelPortVertical = -3.6
-org.eclipse.elk.layered.thoroughness = 100
-org.eclipse.elk.edgeRouting = "SPLINES"
+org.eclipse.elk.spacing.labelPortHorizontal = 1
+org.eclipse.elk.spacing.labelPortVertical = -3.5
+#org.eclipse.elk.layered.considerModelOrder.strategy = "NODES_AND_EDGES"
+#org.eclipse.elk.layered.thoroughness = 100
+#org.eclipse.elk.edgeRouting = "POLYLINE"
+#org.eclipse.elk.edgeRouting = "ORTHOGONAL"
+#org.eclipse.elk.layered.edgeRouting.splines.mode = "CONSERVATIVE"
 #org.eclipse.elk.edgeRouting = "POLYLINE"
 #org.eclipse.elk.layered.edgeRouting.polyline.slopedEdgeZoneWidth = 14.0
 
@@ -41,9 +43,8 @@ properties.org.eclipse.elk.font.name = "Arial"
 properties.org.eclipse.elk.font.size = 16
 
 [node_defaults.port]
-width = 2.0
-height = 2.0
-#properties.org.eclipse.elk.port.side = "[NORTH,EAST,SOUTH,WEST]"
+width = 1.0
+height = 1.0
 
 [node_defaults.port.label]
 text = "Port"
