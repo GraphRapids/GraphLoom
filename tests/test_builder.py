@@ -356,27 +356,28 @@ def test_toml_properties_are_flattened():
     from graphloom.builder import _load_settings
 
     settings = _load_settings("examples/example.settings.toml")
+    assert settings.estimate_label_size_from_font is True
 
     # dotted keys preserved instead of nested objects
-    assert settings.node_defaults.label.properties == {"org.eclipse.elk.font.size": 16}
+    assert settings.node_defaults.label.properties == {
+        "org.eclipse.elk.font.name": "Arial",
+        "org.eclipse.elk.font.size": 16,
+    }
     assert settings.node_defaults.port.properties == {}
     assert settings.subgraph_defaults is not None
     assert settings.subgraph_defaults.width is None
     assert settings.subgraph_defaults.height is None
-    assert settings.subgraph_defaults.label.properties == {"org.eclipse.elk.font.size": 20}
+    assert settings.subgraph_defaults.label.properties == {
+        "org.eclipse.elk.font.name": "Arial",
+        "org.eclipse.elk.font.size": 20,
+    }
     assert settings.subgraph_defaults.port.properties == {}
     assert settings.edge_defaults.label.properties == {
+        "org.eclipse.elk.font.name": "Arial",
         "org.eclipse.elk.font.size": 10,
         "org.eclipse.elk.edgeLabels.inline": False,
     }
-    assert settings.edge_type_overrides["100g"].label.properties == {
-        "org.eclipse.elk.font.size": 11,
-        "org.eclipse.elk.edgeLabels.inline": False,
-    }
-    assert settings.edge_type_overrides["100g"].properties == {
-        "org.eclipse.elk.edge.type": "UNDIRECTED",
-        "org.eclipse.elk.edge.thickness": 3,
-    }
+    assert settings.edge_type_overrides == {}
 
 
 def test_yaml_input_loader():
@@ -418,3 +419,38 @@ def test_canvas_layout_options_accept_port_constraints():
     payload = canvas.model_dump(by_alias=True, exclude_none=True, mode="json")
 
     assert payload["layoutOptions"]["org.eclipse.elk.portConstraints"] == "FREE"
+
+
+def test_estimate_label_size_from_font_overrides_label_dimensions():
+    minimal = MinimalGraphIn(
+        nodes=["A", "B"],
+        links=[{"label": "Link", "from": "A", "to": "B"}],
+    )
+    settings = sample_settings()
+    settings.estimate_label_size_from_font = True
+    settings.edge_defaults.label.width = 1
+    settings.edge_defaults.label.height = 1
+
+    canvas = build_canvas(minimal, settings)
+    label = canvas.edges[0].labels[0]
+
+    assert label.width == pytest.approx(26.0)
+    assert label.height == pytest.approx(14.0)
+
+
+def test_estimate_label_size_requires_font_name_and_size():
+    minimal = MinimalGraphIn(
+        nodes=["A", "B"],
+        links=[{"label": "Link", "from": "A", "to": "B"}],
+    )
+    settings = sample_settings()
+    settings.estimate_label_size_from_font = True
+    settings.edge_defaults.label.width = 33
+    settings.edge_defaults.label.height = 7
+    settings.edge_defaults.label.properties = {"org.eclipse.elk.font.size": 10}
+
+    canvas = build_canvas(minimal, settings)
+    label = canvas.edges[0].labels[0]
+
+    assert label.width == 33
+    assert label.height == 7

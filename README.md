@@ -149,6 +149,7 @@ See `examples/example.settings.toml`
 - `type_overrides`: per-type full NodeDefaults block.
 - `type_icon_map`: mapping type → icon (full list in example file).
 - `auto_create_missing_nodes`: bool.
+- `estimate_label_size_from_font`: bool. When true, label `width`/`height` are estimated from label text if both `org.eclipse.elk.font.name` and `org.eclipse.elk.font.size` are set on that label.
 
 Precedence:
 - Node styling and node-level ELK options: role defaults (`node_defaults`/`subgraph_defaults`) then `type_overrides` for the effective type.

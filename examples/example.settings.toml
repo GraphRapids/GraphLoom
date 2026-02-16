@@ -1,5 +1,8 @@
 # Example defaults mirroring sample_output_01.json
 
+auto_create_missing_nodes = true
+estimate_label_size_from_font = true
+
 [layout_options]
 org.eclipse.elk.algorithm = "layered"
 org.eclipse.elk.portConstraints = "FREE"
@@ -23,18 +26,21 @@ properties.org.eclipse.elk.nodeLabels.placement = "[OUTSIDE, V_BOTTOM, H_CENTER,
 text = "Node"
 width = 150
 height = 16
+properties.org.eclipse.elk.font.name = "Arial"
 properties.org.eclipse.elk.font.size = 16
 
 [node_defaults.port]
 width = 2.0
 height = 2.0
-#properties.org.eclipse.elk.port.side = ""
+#properties.org.eclipse.elk.port.side = "[NORTH,EAST,SOUTH,WEST]"
 
 [node_defaults.port.label]
 text = "Port"
 width = 0
-height = 6
-properties.org.eclipse.elk.font.size = 6
+height = 2
+properties.org.eclipse.elk.font.name = "Arial"
+properties.org.eclipse.elk.font.size = 4
+
 
 [subgraph_defaults]
 type = "subgraph"
@@ -46,6 +52,7 @@ properties.org.eclipse.elk.nodeLabels.placement = "[INSIDE, V_TOP, H_CENTER]"
 text = "Subgraph"
 width = 300
 height = 20
+properties.org.eclipse.elk.font.name = "Arial"
 properties.org.eclipse.elk.font.size = 20
 
 [subgraph_defaults.port]
@@ -54,9 +61,10 @@ height = 2.0
 
 [subgraph_defaults.port.label]
 text = "Port"
-width = 50
-height = 6
-properties.org.eclipse.elk.font.size = 6
+width = 0
+height = 2
+properties.org.eclipse.elk.font.name = "Arial"
+properties.org.eclipse.elk.font.size = 4
 
 [edge_defaults]
 properties.org.eclipse.elk.edge.type = "UNDIRECTED"
@@ -64,23 +72,22 @@ properties.org.eclipse.elk.edge.thickness = 1
 
 [edge_defaults.label]
 text = "Edge"
-width = 100
+width = 200
 height = 10
+properties.org.eclipse.elk.font.name = "Arial"
 properties.org.eclipse.elk.font.size = 10
 properties.org.eclipse.elk.edgeLabels.inline = false
 
-[edge_type_overrides."100g"]
-properties.org.eclipse.elk.edge.type = "UNDIRECTED"
-properties.org.eclipse.elk.edge.thickness = 3
+#[edge_type_overrides."100g"]
+#properties.org.eclipse.elk.edge.type = "UNDIRECTED"
+#properties.org.eclipse.elk.edge.thickness = 3
 
-[edge_type_overrides."100g".label]
-text = "100G"
-width = 140
-height = 12
-properties.org.eclipse.elk.font.size = 11
-properties.org.eclipse.elk.edgeLabels.inline = false
-
-auto_create_missing_nodes = true
+#[edge_type_overrides."100g".label]
+#text = "100G"
+#width = 140
+#height = 12
+#properties.org.eclipse.elk.font.size = 11
+#properties.org.eclipse.elk.edgeLabels.inline = false
 
 [type_icon_map]
 router = "mdi:router"

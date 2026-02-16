@@ -62,6 +62,7 @@ class ElkSettings(BaseSettings):
     edge_defaults: EdgeDefaults
     edge_type_overrides: Dict[str, EdgeDefaults] = Field(default_factory=dict)
     auto_create_missing_nodes: bool = True
+    estimate_label_size_from_font: bool = False
 
     @model_validator(mode="after")
     def ensure_subgraph_defaults(self) -> "ElkSettings":
@@ -98,7 +99,7 @@ def sample_settings() -> ElkSettings:
                     "text": "Node",
                     "width": 150,
                     "height": 16,
-                    "properties": {"org.eclipse.elk.font.size": 16},
+                    "properties": {"org.eclipse.elk.font.name": "Arial", "org.eclipse.elk.font.size": 16},
                 },
                 "port": {
                     "width": 2.0,
@@ -107,7 +108,7 @@ def sample_settings() -> ElkSettings:
                         "text": "Port",
                         "width": 50,
                         "height": 6,
-                        "properties": {"org.eclipse.elk.font.size": 6},
+                        "properties": {"org.eclipse.elk.font.name": "Arial", "org.eclipse.elk.font.size": 6},
                     },
                     "properties": {},
                 },
@@ -124,7 +125,7 @@ def sample_settings() -> ElkSettings:
                     "text": "Node",
                     "width": 150,
                     "height": 16,
-                    "properties": {"org.eclipse.elk.font.size": 16},
+                    "properties": {"org.eclipse.elk.font.name": "Arial", "org.eclipse.elk.font.size": 16},
                 },
                 "port": {
                     "width": 2.0,
@@ -133,7 +134,7 @@ def sample_settings() -> ElkSettings:
                         "text": "Port",
                         "width": 50,
                         "height": 6,
-                        "properties": {"org.eclipse.elk.font.size": 6},
+                        "properties": {"org.eclipse.elk.font.name": "Arial", "org.eclipse.elk.font.size": 6},
                     },
                     "properties": {},
                 },
@@ -149,6 +150,7 @@ def sample_settings() -> ElkSettings:
                     "width": 100,
                     "height": 10,
                     "properties": {
+                        "org.eclipse.elk.font.name": "Arial", 
                         "org.eclipse.elk.font.size": 10,
                         "org.eclipse.elk.edgeLabels.inline": False,
                     },

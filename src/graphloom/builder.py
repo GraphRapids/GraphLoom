@@ -35,6 +35,11 @@ PORT_NAME_MAX_LENGTH = 15
 EDGE_NAME_MIN_LENGTH = 1
 EDGE_NAME_MAX_LENGTH = 40
 
+_LABEL_ESTIMATE_CHAR_WIDTH_FACTOR = 0.6
+_LABEL_ESTIMATE_LINE_HEIGHT_FACTOR = 1.2
+_LABEL_ESTIMATE_HORIZONTAL_PADDING = 2.0
+_LABEL_ESTIMATE_VERTICAL_PADDING = 2.0
+
 
 def _validate_length(value: str, *, field_name: str, min_len: int, max_len: int) -> str:
     length = len(value)
@@ -307,6 +312,45 @@ def _merge_properties(base: Properties, extra: Dict[str, Any]) -> Properties:
     return Properties(**merged)
 
 
+def _estimate_label_dimensions(
+    *,
+    text: str,
+    width: float,
+    height: float,
+    properties: Properties,
+    settings: ElkSettings,
+) -> tuple[float, float]:
+    if not settings.estimate_label_size_from_font:
+        return width, height
+
+    props = properties.model_dump()
+    font_name = props.get("org.eclipse.elk.font.name")
+    font_size_value = props.get("org.eclipse.elk.font.size")
+    if not isinstance(font_name, str) or not font_name.strip():
+        return width, height
+
+    try:
+        font_size = float(font_size_value)
+    except (TypeError, ValueError):
+        return width, height
+    if font_size <= 0:
+        return width, height
+
+    lines = text.splitlines() or [text]
+    line_count = max(len(lines), 1)
+    max_chars = max((len(line) for line in lines), default=0)
+
+    estimated_width = (
+        max_chars * font_size * _LABEL_ESTIMATE_CHAR_WIDTH_FACTOR
+        + _LABEL_ESTIMATE_HORIZONTAL_PADDING
+    )
+    estimated_height = (
+        line_count * font_size * _LABEL_ESTIMATE_LINE_HEIGHT_FACTOR
+        + _LABEL_ESTIMATE_VERTICAL_PADDING
+    )
+    return round(estimated_width, 2), round(estimated_height, 2)
+
+
 def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> Canvas:
     settings = settings or sample_settings()
     parent_layout = _canvas_layout_options(settings.layout_options)
@@ -404,14 +448,22 @@ def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> C
             node_ports: List[Port] = []
             for port_data in ports.get(node_rec.id, OrderedDict()).values():
                 port_defaults = defaults.port
-                port_label = PortLabel(
+                port_label_properties = _merge_properties(
+                    Properties(**port_defaults.label.properties),
+                    {},
+                )
+                port_label_width, port_label_height = _estimate_label_dimensions(
                     text=port_data["label"],
                     width=port_defaults.label.width,
                     height=port_defaults.label.height,
-                    properties=_merge_properties(
-                        Properties(**port_defaults.label.properties),
-                        {},
-                    ),
+                    properties=port_label_properties,
+                    settings=settings,
+                )
+                port_label = PortLabel(
+                    text=port_data["label"],
+                    width=port_label_width,
+                    height=port_label_height,
+                    properties=port_label_properties,
                 )
                 node = Port(
                     id=port_data["id"],
@@ -425,14 +477,22 @@ def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> C
                 )
                 node_ports.append(node)
 
-            node_label = NodeLabel(
+            node_label_properties = _merge_properties(
+                Properties(**defaults.label.properties),
+                {},
+            )
+            node_label_width, node_label_height = _estimate_label_dimensions(
                 text=node_rec.label,
                 width=defaults.label.width,
                 height=defaults.label.height,
-                properties=_merge_properties(
-                    Properties(**defaults.label.properties),
-                    {},
-                ),
+                properties=node_label_properties,
+                settings=settings,
+            )
+            node_label = NodeLabel(
+                text=node_rec.label,
+                width=node_label_width,
+                height=node_label_height,
+                properties=node_label_properties,
             )
 
             node_kwargs: Dict[str, Any] = {
@@ -483,14 +543,22 @@ def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> C
             edge_type_norm = (edge.type or "").strip().lower()
             edge_defaults = edge_type_overrides_lc.get(edge_type_norm) or settings.edge_defaults
             edge_label_text = edge.label or edge_defaults.label.text
-            edge_label = EdgeLabel(
+            edge_label_properties = _merge_properties(
+                Properties(**edge_defaults.label.properties),
+                {},
+            )
+            edge_label_width, edge_label_height = _estimate_label_dimensions(
                 text=edge_label_text,
                 width=edge_defaults.label.width,
                 height=edge_defaults.label.height,
-                properties=_merge_properties(
-                    Properties(**edge_defaults.label.properties),
-                    {},
-                ),
+                properties=edge_label_properties,
+                settings=settings,
+            )
+            edge_label = EdgeLabel(
+                text=edge_label_text,
+                width=edge_label_width,
+                height=edge_label_height,
+                properties=edge_label_properties,
             )
             scope_edges.append(
                 Edge(
