@@ -16,7 +16,7 @@ type = "default"
 width = 50
 height = 50
 properties.org.eclipse.elk.portConstraints = "FREE"
-properties.org.eclipse.elk.portLabels.placement = "[OUTSIDE, NEXT_TO_PORT_IF_POSSIBLE]"
+properties.org.eclipse.elk.portLabels.placement = "[OUTSIDE]"
 properties.org.eclipse.elk.nodeLabels.placement = "[OUTSIDE, V_BOTTOM, H_CENTER, H_PRIORITY]"
 
 [node_defaults.label]
@@ -28,6 +28,7 @@ properties.org.eclipse.elk.font.size = 16
 [node_defaults.port]
 width = 2.0
 height = 2.0
+#properties.org.eclipse.elk.port.side = ""
 
 [node_defaults.port.label]
 text = "Port"

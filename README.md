@@ -43,6 +43,13 @@ graphloom examples/example_01.yaml \
   -s examples/example.settings.toml \
   --layout --elkjs-mode npm
 
+# Save both enriched (pre-layout) and laid-out JSON in one run
+graphloom examples/example_01.yaml \
+  -s examples/example.settings.toml \
+  --layout \
+  --enriched-output /tmp/enriched.json \
+  -o /tmp/layout.json
+
 # npx is kept as an alias of npm mode
 graphloom examples/example_01.yaml \
   -s examples/example.settings.toml \
@@ -52,6 +59,7 @@ Flags:
 - `input` minimal graph JSON/YAML (required positional arg)
 - `-s/--settings` settings TOML/JSON (optional; uses built-in sample settings when omitted)
 - `-o/--output` write to file (stdout if omitted)
+- `--enriched-output` write enriched JSON before optional `--layout` processing
 - `--layout` run local elkjs layout before writing output
 - `--elkjs-mode` choose `node` (default), `npm` (auto-install cache), or `npx` (alias of `npm`) when `--layout` is used
 - `--node-cmd` Node.js executable name/path (default `node`)

@@ -586,6 +586,10 @@ def main(argv: List[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Enrich minimal graph JSON/YAML into ELK JSON.")
     parser.add_argument("input", help="Path to minimal input JSON or YAML")
     parser.add_argument("-o", "--output", help="Where to write ELK JSON (default: stdout)")
+    parser.add_argument(
+        "--enriched-output",
+        help="Where to write enriched ELK JSON before optional --layout processing.",
+    )
     parser.add_argument("-s", "--settings", help="Path to settings TOML/JSON (optional)")
     parser.add_argument(
         "--layout",
@@ -608,7 +612,12 @@ def main(argv: List[str] | None = None) -> int:
     data = _load_input(args.input)
     settings = _load_settings(args.settings)
     canvas = build_canvas(data, settings)
-    payload = canvas.model_dump(by_alias=True, exclude_none=True)
+    enriched_payload = canvas.model_dump(by_alias=True, exclude_none=True)
+    if args.enriched_output:
+        with open(args.enriched_output, "w", encoding="utf-8") as f:
+            f.write(json.dumps(enriched_payload, indent=2))
+
+    payload = enriched_payload
     if args.layout:
         payload = layout_with_elkjs(payload, mode=args.elkjs_mode, node_cmd=args.node_cmd)
     output = json.dumps(payload, indent=2)

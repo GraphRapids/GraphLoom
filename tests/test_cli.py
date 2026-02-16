@@ -71,6 +71,36 @@ def test_builder_main_layout_forwards_mode_and_node_cmd(tmp_path, monkeypatch):
     assert out["layoutApplied"] is True
 
 
+def test_builder_main_can_write_enriched_and_layout_outputs(tmp_path, monkeypatch):
+    input_path = tmp_path / "input.json"
+    enriched_path = tmp_path / "enriched.json"
+    layout_path = tmp_path / "layout.json"
+    _write_minimal_input(input_path)
+
+    def fake_layout(payload, *, mode, node_cmd):
+        return {"id": payload.get("id"), "layoutApplied": True}
+
+    monkeypatch.setattr(builder_mod, "layout_with_elkjs", fake_layout)
+
+    exit_code = builder_mod.main(
+        [
+            str(input_path),
+            "--layout",
+            "--enriched-output",
+            str(enriched_path),
+            "-o",
+            str(layout_path),
+        ]
+    )
+
+    assert exit_code == 0
+    enriched = json.loads(enriched_path.read_text(encoding="utf-8"))
+    laid_out = json.loads(layout_path.read_text(encoding="utf-8"))
+    assert enriched["id"] == "canvas"
+    assert "layoutApplied" not in enriched
+    assert laid_out["layoutApplied"] is True
+
+
 def test_dev_main_delegates_to_builder_main(monkeypatch):
     dev_main = _load_dev_main_module()
     captured: dict[str, object] = {}
