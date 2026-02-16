@@ -89,6 +89,7 @@ def sample_settings() -> ElkSettings:
                 "org.eclipse.elk.aspectRatio": "1.414",
                 "org.eclipse.elk.zoomToFit": True,
                 "org.eclipse.elk.direction": "RIGHT",
+                "org.eclipse.elk.padding": "[top=40,left=40,bottom=40,right=40]",
             },
             "node_defaults": {
                 "type": "default",

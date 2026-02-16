@@ -62,6 +62,7 @@ def test_sample_build():
 
     # Layout options sourced from settings
     assert canvas.layoutOptions.org_eclipse_elk_algorithm == "layered"
+    assert canvas.layoutOptions.org_eclipse_elk_padding == "[top=40,left=40,bottom=40,right=40]"
 
 
 def test_subgraph_dimensions_omitted_in_payload():
