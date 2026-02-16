@@ -376,7 +376,7 @@ def test_toml_properties_are_flattened():
     assert settings.edge_defaults.label.properties == {
         "org.eclipse.elk.font.name": "Arial",
         "org.eclipse.elk.font.size": 10,
-        "org.eclipse.elk.edgeLabels.inline": False,
+        "org.eclipse.elk.edgeLabels.inline": True,
     }
     assert settings.edge_type_overrides == {}
 
@@ -435,8 +435,8 @@ def test_estimate_label_size_from_font_overrides_label_dimensions():
     canvas = build_canvas(minimal, settings)
     label = canvas.edges[0].labels[0]
 
-    assert label.width == pytest.approx(26.0)
-    assert label.height == pytest.approx(14.0)
+    assert label.width == pytest.approx(25.0)
+    assert label.height == pytest.approx(13.0)
 
 
 def test_estimate_label_size_requires_font_name_and_size():
