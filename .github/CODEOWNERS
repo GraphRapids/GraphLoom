@@ -1,0 +1,16 @@
+# Default ownership
+* @Faerkeren
+
+# Core project files
+/src/ @Faerkeren
+/tests/ @Faerkeren
+/examples/ @Faerkeren
+/pyproject.toml @Faerkeren
+
+# Project automation and policy
+/.github/ @Faerkeren
+/README.md @Faerkeren
+/SECURITY.md @Faerkeren
+/CONTRIBUTING.md @Faerkeren
+/CHANGELOG.md @Faerkeren
+/RELEASE.md @Faerkeren

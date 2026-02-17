@@ -6,6 +6,15 @@ build-backend = "setuptools.build_meta"
 name = "graphloom"
 version = "0.1.0"
 description = "Enriches minimal JSON input to valid ELK JSON output"
+keywords = [
+    "elk",
+    "graph",
+    "pydantic",
+    "network-topology",
+    "diagram-layout",
+    "json",
+    "yaml"
+]
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.10"

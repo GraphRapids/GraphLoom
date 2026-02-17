@@ -173,6 +173,12 @@ Default type is `default` with no icon; mapping wins when present, otherwise ove
 - Run tests: `. .venv/bin/activate && pytest -q`
 - Example run: `graphloom examples/example_01.yaml -s examples/example.settings.toml`
 
+## Project Policies
+- Security reporting: `SECURITY.md`
+- Contribution guide: `CONTRIBUTING.md`
+- Code of conduct: `CODE_OF_CONDUCT.md`
+- Release process and versioning: `RELEASE.md` and `CHANGELOG.md`
+
 ## Acknowledgements
 GraphLoom builds on excellent open source projects:
 - [Eclipse Layout Kernel (ELK)](https://www.eclipse.org/elk/)
