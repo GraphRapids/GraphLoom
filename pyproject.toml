@@ -41,6 +41,7 @@ classifiers = [
 Homepage = "https://github.com/Faerkeren/GraphLoom"
 Repository = "https://github.com/Faerkeren/GraphLoom"
 Issues = "https://github.com/Faerkeren/GraphLoom/issues"
+Changelog = "https://github.com/Faerkeren/GraphLoom/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 dev = [
@@ -60,3 +61,8 @@ graphloom = [
 
 [project.scripts]
 graphloom = "graphloom.builder:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-ra"

@@ -4,26 +4,39 @@ This project uses Semantic Versioning (SemVer) and tagged GitHub releases.
 
 ## Versioning Policy
 
-- `MAJOR` (`X.0.0`): Breaking API or behavior changes
-- `MINOR` (`0.X.0`): Backward-compatible features
-- `PATCH` (`0.0.X`): Backward-compatible fixes and documentation-only release notes updates
+- `MAJOR` (`X.0.0`): breaking API or behavior changes
+- `MINOR` (`0.X.0`): backward-compatible features
+- `PATCH` (`0.0.X`): backward-compatible fixes and documentation updates
 
 Tag format is `vX.Y.Z` (for example, `v0.2.1`).
 
-## Release Checklist
+## 1. Prepare Release PR
 
 1. Ensure `main` is green (`CI`, `Tests`, and `Gitleaks`).
 2. Update `CHANGELOG.md`:
    - Move items from `Unreleased` to a new version section.
-   - Add release date.
+   - Add the release date.
 3. Bump `version` in `pyproject.toml`.
-4. Commit release prep:
-   - `git add CHANGELOG.md pyproject.toml`
-   - `git commit -m "chore(release): vX.Y.Z"`
-5. Create and push an annotated tag:
-   - `git tag -a vX.Y.Z -m "vX.Y.Z"`
-   - `git push origin vX.Y.Z`
-6. The `Release` workflow creates a GitHub release automatically for that tag.
+4. Open a PR and merge it to `main`.
+
+## 2. Tag and Publish
+
+After merge to `main`:
+
+```bash
+git checkout main
+git pull --ff-only
+git tag -a vX.Y.Z -m "vX.Y.Z"
+git push origin vX.Y.Z
+```
+
+The `Release` workflow publishes the GitHub release for that tag.
+
+## 3. Post-Release
+
+1. Add a new empty `Unreleased` section at the top of `CHANGELOG.md`.
+2. Verify package/build artifacts if distribution is planned.
+3. Announce release notes.
 
 ## Hotfixes
 

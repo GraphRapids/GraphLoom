@@ -1,43 +1,59 @@
-# Contributing to GraphLoom
+# Contributing
 
-Thanks for contributing.
+Thanks for contributing to GraphLoom.
 
 ## Development Setup
 
-1. Create and activate a virtual environment.
-   `python3 -m venv .venv`
-   `. .venv/bin/activate`
-2. Install the project in editable mode with dev dependencies.
-   `pip install -e .[dev]`
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -e ".[dev]"
+```
 
-## Run Tests
+## Running Checks
 
-- Run the full test suite: `pytest -q`
+Run tests:
 
-## Pull Request Guidelines
+```bash
+python -m pytest -q
+```
 
-1. Branch from `main`.
-2. Keep changes focused and include tests when behavior changes.
-3. Update docs for user-facing behavior changes.
-4. Ensure required checks pass: `CI`, `Tests`, and `Gitleaks`.
-5. Request review from CODEOWNERS.
+Run a CLI smoke check:
 
-## Commit Messages
+```bash
+python -m graphloom.builder examples/example_01.yaml -s examples/example.settings.toml -o /tmp/graphloom-check.json
+```
 
-Conventional commit style is preferred:
-- `feat: ...`
-- `fix: ...`
-- `docs: ...`
-- `test: ...`
-- `chore: ...`
+## Project Structure
 
-## Security Issues
+- `src/graphloom/`: library code
+- `main.py`: local development entrypoint
+- `tests/`: pytest suite
+- `examples/`: sample minimal inputs and settings
+- `.github/workflows/`: CI, tests, release, and secret scanning
 
-Do not file public issues for vulnerabilities.
-Follow `SECURITY.md` for private reporting.
+## Pull Requests
 
-## Release Expectations
+Before opening a PR:
 
-- Versioning follows SemVer.
-- Update `CHANGELOG.md` for user-visible changes.
-- Follow `RELEASE.md` for tagged releases.
+1. Keep changes focused and atomic.
+2. Add or update tests for behavioral changes.
+3. Update docs (`README.md`, `CHANGELOG.md`, `THIRD_PARTY_NOTICES.md`) when relevant.
+4. Ensure workflows are green (`CI`, `Tests`, `Gitleaks`).
+
+## Commit Guidance
+
+- Use clear, imperative commit messages.
+- Prefer conventional prefixes (`feat`, `fix`, `docs`, `test`, `chore`).
+- Reference issue numbers when applicable.
+- Avoid bundling unrelated changes in one PR.
+
+## Reporting Bugs and Requesting Features
+
+Use GitHub issue templates:
+
+- Bug report
+- Feature request
+
+For security issues, follow `SECURITY.md`.

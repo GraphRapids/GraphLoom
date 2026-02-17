@@ -1,6 +1,6 @@
 ## Summary
 
-Describe what changed and why.
+Describe the change and motivation.
 
 ## Type of change
 
@@ -12,8 +12,13 @@ Describe what changed and why.
 
 ## Checklist
 
-- [ ] I ran tests locally (`pytest -q`)
-- [ ] I updated documentation as needed
-- [ ] I updated `CHANGELOG.md` for user-visible changes
-- [ ] I verified no secrets were introduced
-- [ ] I requested review from CODEOWNERS
+- [ ] Tests added/updated for behavior changes
+- [ ] `python -m pytest -q` passes locally
+- [ ] Documentation updated (`README.md` / `CHANGELOG.md` / notices) when relevant
+- [ ] `CHANGELOG.md` updated for user-visible changes
+- [ ] No sensitive data introduced
+- [ ] Backward compatibility considered
+
+## Related Issues
+
+Closes #<issue-number>

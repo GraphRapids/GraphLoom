@@ -1,31 +1,44 @@
 # Third-Party Notices
 
-GraphLoom depends on third-party open source projects. This document provides
-attribution and quick license references for projects used directly by this
-repository.
+Last verified: 2026-02-17
 
-This file is informational and does not replace the license terms of upstream
-projects. See each project's repository and license file for the authoritative
-license text.
+GraphLoom is licensed under Apache-2.0. This file documents third-party software and tools used by the project.
 
-## Runtime Dependencies
+## Runtime dependencies
 
-| Project | Purpose in GraphLoom | License | Source |
+| Component | How GraphLoom uses it | License | Source |
 | --- | --- | --- | --- |
-| Pydantic | Data models and validation | MIT | https://github.com/pydantic/pydantic |
-| pydantic-settings | Settings loading and environment integration | MIT | https://github.com/pydantic/pydantic-settings |
-| PyYAML | YAML input parsing | MIT | https://github.com/yaml/pyyaml |
-| tomli | TOML parsing fallback on Python < 3.11 | MIT | https://github.com/hukkin/tomli |
+| `pydantic` | Data models and validation | MIT | https://github.com/pydantic/pydantic |
+| `pydantic-settings` | Settings loading and environment overrides | MIT | https://github.com/pydantic/pydantic-settings |
+| `PyYAML` | YAML input parsing | MIT | https://github.com/yaml/pyyaml |
+| `tomli` (Python < 3.11) | TOML parsing fallback | MIT | https://github.com/hukkin/tomli |
 
-## Optional Layout Runtime
+## Optional layout runtime (not redistributed)
 
-| Project | Purpose in GraphLoom | License | Source |
+| Component | How GraphLoom uses it | License | Source |
 | --- | --- | --- | --- |
-| Eclipse Layout Kernel (ELK) | Graph layout engine and option model | EPL-2.0 | https://github.com/eclipse-elk/elk |
-| elkjs | JavaScript/Node runtime binding for ELK layout | EPL-2.0 | https://github.com/kieler/elkjs |
+| Eclipse Layout Kernel (ELK) | Graph layout model and options reference | EPL-2.0 | https://github.com/eclipse-elk/elk |
+| `elkjs` | Optional local layout execution via Node.js | EPL-2.0 | https://github.com/kieler/elkjs |
+| Node.js / npm | Optional runtime for `--layout` modes | Mixed (Node.js project licensing) | https://nodejs.org/ |
 
-## Development Dependencies
+## Build and development tooling (not redistributed)
 
-| Project | Purpose in GraphLoom | License | Source |
+| Component | How GraphLoom uses it | License | Source |
 | --- | --- | --- | --- |
-| pytest | Test framework | MIT | https://github.com/pytest-dev/pytest |
+| `setuptools` | Build backend (`setuptools.build_meta`) | MIT | https://github.com/pypa/setuptools |
+| `wheel` | Wheel artifact creation | MIT | https://github.com/pypa/wheel |
+| `pytest` | Test framework | MIT | https://github.com/pytest-dev/pytest |
+
+## Downstream obligations
+
+- If you enable `--layout`, ensure your distribution and compliance process includes `elkjs`/Node.js obligations in your environment.
+- Keep this file updated when runtime dependencies, build tooling, or optional integrations change.
+
+## Verification sources used for this update
+
+- Local project files:
+  - `pyproject.toml`
+  - `README.md`
+  - `src/graphloom/builder.py`
+  - `src/graphloom/elkjs.py`
+- Upstream repositories and package metadata linked above.

@@ -1,53 +1,61 @@
 name: Bug report
-description: Report a reproducible defect
+description: Report a reproducible bug
 title: "[Bug]: "
-labels:
-  - bug
-assignees:
-  - Faerkeren
+labels: [bug]
 body:
   - type: markdown
     attributes:
       value: |
         Thanks for reporting a bug. Please provide enough detail to reproduce it.
+
   - type: input
-    id: version
-    attributes:
-      label: Version
-      description: What version, commit SHA, or branch are you using?
-      placeholder: "v0.1.0 or commit SHA"
-    validations:
-      required: true
-  - type: textarea
     id: summary
     attributes:
       label: Summary
-      description: Clear and concise description of the problem
+      description: One-line description of the problem
+      placeholder: Graph generation fails when...
     validations:
       required: true
+
   - type: textarea
     id: steps
     attributes:
       label: Steps to reproduce
-      description: Minimal sequence that reproduces the issue
+      description: Provide exact steps and, if possible, a minimal input file
       placeholder: |
-        1. ...
-        2. ...
-        3. ...
+        1. Run ...
+        2. Use this input ...
+        3. Observe ...
     validations:
       required: true
+
   - type: textarea
     id: expected
     attributes:
       label: Expected behavior
     validations:
       required: true
+
   - type: textarea
     id: actual
     attributes:
       label: Actual behavior
     validations:
       required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Project version
+      placeholder: 0.1.0
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, Python version, and install method
+      placeholder: macOS 14, Python 3.12, pip install -e .
+
   - type: textarea
     id: logs
     attributes:
