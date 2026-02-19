@@ -3,9 +3,9 @@ requires = ["setuptools>=69", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "graphloom"
+name = "GraphLoom"
 version = "0.1.0"
-description = "Enriches minimal JSON input to valid ELK JSON output"
+description = "Converts simplified YAML graph definitions into enriched laid-out ELK JSON"
 keywords = [
     "elk",
     "graph",
@@ -38,10 +38,10 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/Faerkeren/GraphLoom"
-Repository = "https://github.com/Faerkeren/GraphLoom"
-Issues = "https://github.com/Faerkeren/GraphLoom/issues"
-Changelog = "https://github.com/Faerkeren/GraphLoom/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/GraphRapids/GraphLoom"
+Repository = "https://github.com/GraphRapids/GraphLoom"
+Issues = "https://github.com/GraphRapids/GraphLoom/issues"
+Changelog = "https://github.com/GraphRapids/GraphLoom/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 dev = [
