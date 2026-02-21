@@ -80,22 +80,27 @@ class ElkSettings(BaseSettings):
 def sample_settings() -> ElkSettings:
     return ElkSettings.model_validate(
         {
+            "auto_create_missing_nodes": True,
+            "estimate_label_size_from_font": True,
             "layout_options": {
                 "org.eclipse.elk.algorithm": "layered",
+                "org.eclipse.elk.layered.layering.strategy": "NETWORK_SIMPLEX",
+                "org.eclipse.elk.layered.nodePlacement.strategy": "NETWORK_SIMPLEX",
+                "org.eclipse.elk.portConstraints": "FREE",
                 "org.eclipse.elk.nodeSize.constraints": "MINIMUM_SIZE",
                 "org.eclipse.elk.nodeSize.options": "[DEFAULT_MINIMUM_SIZE,COMPUTE_PADDING,MINIMUM_SIZE_ACCOUNTS_FOR_PADDING]",
                 "org.eclipse.elk.hierarchyHandling": "INCLUDE_CHILDREN",
-                "org.eclipse.elk.layered.layering.strategy": "NETWORK_SIMPLEX",
                 "org.eclipse.elk.aspectRatio": "1.414",
                 "org.eclipse.elk.zoomToFit": True,
                 "org.eclipse.elk.direction": "RIGHT",
-                "org.eclipse.elk.padding": "[top=40,left=40,bottom=40,right=40]",
+                "org.eclipse.elk.padding": "[top=60,left=60,bottom=60,right=60]",
+                "org.eclipse.elk.spacing.labelPortHorizontal": 1,
+                "org.eclipse.elk.spacing.labelPortVertical": -3.5,
             },
             "node_defaults": {
                 "type": "default",
-                "icon": None,
-                "width": 50,
-                "height": 50,
+                "width": 60,
+                "height": 60,
                 "label": {
                     "text": "Node",
                     "width": 150,
@@ -103,39 +108,39 @@ def sample_settings() -> ElkSettings:
                     "properties": {"org.eclipse.elk.font.name": "Arial", "org.eclipse.elk.font.size": 16},
                 },
                 "port": {
-                    "width": 2.0,
-                    "height": 2.0,
+                    "width": 1.0,
+                    "height": 1.0,
                     "label": {
                         "text": "Port",
-                        "width": 50,
-                        "height": 6,
-                        "properties": {"org.eclipse.elk.font.name": "Arial", "org.eclipse.elk.font.size": 6},
+                        "width": 0,
+                        "height": 2,
+                        "properties": {"org.eclipse.elk.font.name": "Arial", "org.eclipse.elk.font.size": 4},
                     },
                     "properties": {},
                 },
                 "properties": {
                     "org.eclipse.elk.portConstraints": "FREE",
-                    "org.eclipse.elk.portLabels.placement": "[OUTSIDE, NEXT_TO_PORT_IF_POSSIBLE]",
+                    "org.eclipse.elk.portLabels.treatAsGroup": True,
+                    "org.eclipse.elk.portLabels.placement": "[OUTSIDE,NEXT_TO_PORT_IF_POSSIBLE]",
                     "org.eclipse.elk.nodeLabels.placement": "[OUTSIDE, V_BOTTOM, H_CENTER, H_PRIORITY]",
                 },
             },
             "subgraph_defaults": {
                 "type": "subgraph",
-                "icon": None,
                 "label": {
-                    "text": "Node",
-                    "width": 150,
-                    "height": 16,
-                    "properties": {"org.eclipse.elk.font.name": "Arial", "org.eclipse.elk.font.size": 16},
+                    "text": "Subgraph",
+                    "width": 300,
+                    "height": 20,
+                    "properties": {"org.eclipse.elk.font.name": "Arial", "org.eclipse.elk.font.size": 20},
                 },
                 "port": {
                     "width": 2.0,
                     "height": 2.0,
                     "label": {
                         "text": "Port",
-                        "width": 50,
-                        "height": 6,
-                        "properties": {"org.eclipse.elk.font.name": "Arial", "org.eclipse.elk.font.size": 6},
+                        "width": 0,
+                        "height": 2,
+                        "properties": {"org.eclipse.elk.font.name": "Arial", "org.eclipse.elk.font.size": 4},
                     },
                     "properties": {},
                 },
@@ -148,12 +153,12 @@ def sample_settings() -> ElkSettings:
             "edge_defaults": {
                 "label": {
                     "text": "Edge",
-                    "width": 100,
+                    "width": 200,
                     "height": 10,
                     "properties": {
-                        "org.eclipse.elk.font.name": "Arial", 
+                        "org.eclipse.elk.font.name": "Arial",
                         "org.eclipse.elk.font.size": 10,
-                        "org.eclipse.elk.edgeLabels.inline": False,
+                        "org.eclipse.elk.edgeLabels.inline": True,
                     },
                 },
                 "properties": {

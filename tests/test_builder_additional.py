@@ -209,6 +209,7 @@ def test_build_canvas_falls_back_to_node_defaults_when_subgraph_defaults_missing
         }
     )
     settings = sample_settings()
+    settings.estimate_label_size_from_font = False
     settings.subgraph_defaults = None
 
     canvas = builder_mod.build_canvas(minimal, settings)

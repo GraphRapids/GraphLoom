@@ -62,7 +62,7 @@ def test_sample_build():
 
     # Layout options sourced from settings
     assert canvas.layoutOptions.org_eclipse_elk_algorithm == "layered"
-    assert canvas.layoutOptions.org_eclipse_elk_padding == "[top=40,left=40,bottom=40,right=40]"
+    assert canvas.layoutOptions.org_eclipse_elk_padding == "[top=60,left=60,bottom=60,right=60]"
 
 
 def test_subgraph_dimensions_omitted_in_payload():
@@ -242,6 +242,7 @@ def test_edge_type_overrides_apply_for_matching_type():
         links=[{"type": "100G", "from": "A", "to": "B"}],
     )
     settings = sample_settings()
+    settings.estimate_label_size_from_font = False
     override = settings.edge_defaults.model_copy(deep=True)
     override.label.text = "100G default label"
     override.label.width = 222
@@ -267,6 +268,7 @@ def test_role_defaults_apply_separately_for_subgraph_and_leaf_nodes():
         links=[],
     )
     settings = sample_settings()
+    settings.estimate_label_size_from_font = False
     settings.node_defaults.label.width = 111
     settings.node_defaults.icon = "leaf-icon"
     assert settings.subgraph_defaults is not None
@@ -288,6 +290,7 @@ def test_subgraph_defaults_fallback_to_node_defaults_when_omitted():
     raw = sample_settings().model_dump()
     raw.pop("subgraph_defaults", None)
     settings = ElkSettings.model_validate(raw)
+    settings.estimate_label_size_from_font = False
 
     minimal = MinimalGraphIn(
         nodes=[{"name": "Cluster", "nodes": [{"name": "Leaf"}]}],
