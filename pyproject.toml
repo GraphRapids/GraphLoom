@@ -47,6 +47,9 @@ Changelog = "https://github.com/GraphRapids/GraphLoom/blob/main/CHANGELOG.md"
 dev = [
     "pytest>=8",
 ]
+themes = [
+    "GraphTheme>=0.1.0",
+]
 
 [tool.setuptools]
 package-dir = {"" = "src"}
