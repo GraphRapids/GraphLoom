@@ -26,6 +26,25 @@ def test_apply_theme_metrics_updates_font_and_edge_defaults() -> None:
     assert themed.node_defaults.label.height >= 22
 
 
+def test_apply_theme_metrics_supports_per_label_font_sizes() -> None:
+    themed = apply_theme_metrics(
+        sample_settings(),
+        {
+            "font_family": "Arial, Helvetica, sans-serif",
+            "node_font_size_px": 16,
+            "port_font_size_px": 4,
+            "edge_font_size_px": 10,
+            "label_line_height_px": 16,
+            "edge_thickness_px": 1,
+            "node_padding_px": 10,
+        },
+    )
+
+    assert themed.node_defaults.label.properties["org.eclipse.elk.font.size"] == 16.0
+    assert themed.node_defaults.port.label.properties["org.eclipse.elk.font.size"] == 4.0
+    assert themed.edge_defaults.label.properties["org.eclipse.elk.font.size"] == 10.0
+
+
 def test_main_applies_theme_id_before_build(monkeypatch, tmp_path) -> None:
     input_path = tmp_path / "input.json"
     input_path.write_text('{"nodes":["A"],"links":[]}', encoding="utf-8")

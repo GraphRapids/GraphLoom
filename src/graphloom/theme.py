@@ -14,7 +14,10 @@ def apply_theme_metrics(settings: ElkSettings, metrics: Mapping[str, Any]) -> El
     themed = settings.model_copy(deep=True)
 
     font_family = metrics.get("font_family")
-    font_size = metrics.get("font_size_px")
+    fallback_font_size = metrics.get("font_size_px")
+    node_font_size = metrics.get("node_font_size_px", fallback_font_size)
+    port_font_size = metrics.get("port_font_size_px", fallback_font_size)
+    edge_font_size = metrics.get("edge_font_size_px", fallback_font_size)
     line_height = metrics.get("label_line_height_px")
     edge_thickness = metrics.get("edge_thickness_px")
     hpad = metrics.get("node_label_horizontal_padding_px", 0)
@@ -23,14 +26,18 @@ def apply_theme_metrics(settings: ElkSettings, metrics: Mapping[str, Any]) -> El
     if font_family is not None:
         _set_font_family(themed, str(font_family))
 
-    if font_size is not None:
-        try:
-            parsed_font_size = float(font_size)
-        except (TypeError, ValueError):
-            parsed_font_size = None
-        if parsed_font_size is not None and parsed_font_size > 0:
-            _set_font_size(themed, parsed_font_size)
-            themed.estimate_label_size_from_font = True
+    parsed_node_size = _parse_positive_float(node_font_size)
+    parsed_port_size = _parse_positive_float(port_font_size)
+    parsed_edge_size = _parse_positive_float(edge_font_size)
+
+    if any(size is not None for size in (parsed_node_size, parsed_port_size, parsed_edge_size)):
+        _set_font_sizes(
+            themed,
+            node_font_size=parsed_node_size,
+            port_font_size=parsed_port_size,
+            edge_font_size=parsed_edge_size,
+        )
+        themed.estimate_label_size_from_font = True
 
     if line_height is not None:
         try:
@@ -74,13 +81,37 @@ def _set_font_family(settings: ElkSettings, font_family: str) -> None:
         settings.subgraph_defaults.port.label.properties[_FONT_NAME_KEY] = font_family
 
 
-def _set_font_size(settings: ElkSettings, font_size: float) -> None:
-    settings.node_defaults.label.properties[_FONT_SIZE_KEY] = font_size
-    settings.node_defaults.port.label.properties[_FONT_SIZE_KEY] = font_size
-    settings.edge_defaults.label.properties[_FONT_SIZE_KEY] = font_size
-    if settings.subgraph_defaults is not None:
-        settings.subgraph_defaults.label.properties[_FONT_SIZE_KEY] = font_size
-        settings.subgraph_defaults.port.label.properties[_FONT_SIZE_KEY] = font_size
+def _set_font_sizes(
+    settings: ElkSettings,
+    *,
+    node_font_size: float | None,
+    port_font_size: float | None,
+    edge_font_size: float | None,
+) -> None:
+    if node_font_size is not None:
+        settings.node_defaults.label.properties[_FONT_SIZE_KEY] = node_font_size
+        if settings.subgraph_defaults is not None:
+            settings.subgraph_defaults.label.properties[_FONT_SIZE_KEY] = node_font_size
+
+    if port_font_size is not None:
+        settings.node_defaults.port.label.properties[_FONT_SIZE_KEY] = port_font_size
+        if settings.subgraph_defaults is not None:
+            settings.subgraph_defaults.port.label.properties[_FONT_SIZE_KEY] = port_font_size
+
+    if edge_font_size is not None:
+        settings.edge_defaults.label.properties[_FONT_SIZE_KEY] = edge_font_size
+
+
+def _parse_positive_float(value: Any) -> float | None:
+    if value is None:
+        return None
+    try:
+        parsed = float(value)
+    except (TypeError, ValueError):
+        return None
+    if parsed <= 0:
+        return None
+    return parsed
 
 
 def _set_label_heights(
