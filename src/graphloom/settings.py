@@ -150,6 +150,8 @@ def sample_settings() -> ElkSettings:
                     "org.eclipse.elk.portConstraints": "FREE",
                     "org.eclipse.elk.portLabels.placement": "[OUTSIDE, NEXT_TO_PORT_IF_POSSIBLE]",
                     "org.eclipse.elk.nodeLabels.placement": "[INSIDE, V_TOP, H_CENTER]",
+                    "org.eclipse.elk.spacing.labelPortHorizontal": 1,
+                    "org.eclipse.elk.spacing.labelPortVertical": -3.5,
                 },
             },
                 "edge_defaults": {
