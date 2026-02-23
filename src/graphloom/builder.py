@@ -248,6 +248,31 @@ def _as_edge(edge: "MinimalEdgeIn | str") -> "MinimalEdgeIn":
     return MinimalEdgeIn.model_validate(_normalize_link_entry(edge))
 
 
+def _collect_alias_candidates(graph_data: MinimalGraphIn) -> Dict[str, List[str]]:
+    """Collect node aliases across all scopes for cross-scope endpoint resolution."""
+    alias_candidates: Dict[str, List[str]] = {}
+
+    def add_alias(alias: str, node_id: str) -> None:
+        alias_candidates.setdefault(alias, []).append(node_id)
+
+    def visit(scope: MinimalGraphIn) -> None:
+        for node_raw in scope.nodes:
+            node = _as_node(node_raw)
+            node_id_source = node.id or node.name
+            node_id = sanitize_id(node_id_source)
+            aliases = _candidate_aliases(node.name)
+            if node.id:
+                aliases.extend(_candidate_aliases(node.id))
+            aliases.append(node_id)
+            for alias in dict.fromkeys(aliases):
+                add_alias(alias, node_id)
+            if node.nodes or node.links:
+                visit(MinimalGraphIn(nodes=node.nodes, links=node.links))
+
+    visit(graph_data)
+    return alias_candidates
+
+
 class _NodeRecord(BaseModel):
     id: str
     label: str
@@ -355,6 +380,7 @@ def _estimate_label_dimensions(
 def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> Canvas:
     settings = settings or sample_settings()
     parent_layout = _canvas_layout_options(settings.layout_options)
+    global_alias_candidates = _collect_alias_candidates(data)
 
     type_overrides_lc = {k.lower(): v for k, v in settings.type_overrides.items()}
     type_icon_map_lc = {k.lower(): v for k, v in settings.type_icon_map.items()}
@@ -402,22 +428,44 @@ def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> C
                 input_node=node,
             )
 
-        def ensure_node(node_token: str) -> _NodeRecord:
+        def ensure_node(node_token: str) -> tuple[_NodeRecord, bool]:
             token_norm = sanitize_id(node_token)
             if token_norm in alias_index:
                 node_id = alias_index[token_norm]
-                return nodes[node_id]
+                return nodes[node_id], True
+
+            global_matches = global_alias_candidates.get(token_norm, [])
+            if len(global_matches) == 1:
+                return (
+                    _NodeRecord(
+                        id=global_matches[0],
+                        label=node_token,
+                        type=settings.node_defaults.type,
+                        aliases=[token_norm],
+                    ),
+                    False,
+                )
+            if len(global_matches) > 1:
+                unique_matches = sorted(dict.fromkeys(global_matches))
+                raise ValueError(
+                    f"Ambiguous node '{node_token}' referenced by edge; matches node ids: "
+                    f"{', '.join(unique_matches)}"
+                )
             if not settings.auto_create_missing_nodes:
                 raise ValueError(f"Unknown node '{node_token}' referenced by edge")
-            return register_node(label=node_token)
+            return register_node(label=node_token), True
 
         for edge_raw in graph_data.links:
             edge = _as_edge(edge_raw)
             for endpoint in (edge.source, edge.target):
                 node_part, port_part = split_endpoint(endpoint)
-                node_rec = ensure_node(node_part)
+                node_rec, is_local_node = ensure_node(node_part)
                 if port_part is None:
                     continue
+                if not is_local_node:
+                    raise ValueError(
+                        f"Cannot reference port '{port_part}' on out-of-scope node '{node_part}'"
+                    )
                 port_key = sanitize_id(port_part)
                 if node_rec.id not in ports:
                     ports[node_rec.id] = OrderedDict()
@@ -524,10 +572,14 @@ def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> C
             targets: List[str] = []
             for endpoint, bucket in ((edge.source, sources), (edge.target, targets)):
                 node_part, port_part = split_endpoint(endpoint)
-                node_rec = ensure_node(node_part)
+                node_rec, is_local_node = ensure_node(node_part)
                 if port_part is None:
                     bucket.append(node_rec.id)
                     continue
+                if not is_local_node:
+                    raise ValueError(
+                        f"Cannot reference port '{port_part}' on out-of-scope node '{node_part}'"
+                    )
                 port_key = sanitize_id(port_part)
                 port_id = ports[node_rec.id][port_key]["id"]
                 bucket.append(port_id)

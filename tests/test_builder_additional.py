@@ -201,6 +201,48 @@ def test_build_canvas_rejects_unknown_nodes_when_auto_create_disabled():
         builder_mod.build_canvas(minimal, settings)
 
 
+def test_build_canvas_resolves_root_edge_to_unique_nested_node_without_autocreate():
+    minimal = MinimalGraphIn.model_validate(
+        {
+            "nodes": [
+                {
+                    "name": "subgraph",
+                    "nodes": [
+                        {"name": "A", "type": "switch"},
+                        {"name": "B", "type": "router"},
+                    ],
+                    "links": [{"from": "A:eth0", "to": "B:eth1", "label": "1000"}],
+                },
+                {"name": "C", "type": "switch"},
+            ],
+            "links": [{"from": "A", "to": "C", "label": "foobar"}],
+        }
+    )
+
+    canvas = builder_mod.build_canvas(minimal, sample_settings())
+
+    assert [node.id for node in canvas.children] == ["subgraph", "c"]
+    assert [node.id for node in canvas.children[0].children] == ["a", "b"]
+    assert canvas.edges[0].sources == ["a"]
+    assert canvas.edges[0].targets == ["c"]
+
+
+def test_build_canvas_rejects_ambiguous_cross_scope_node_reference():
+    minimal = MinimalGraphIn.model_validate(
+        {
+            "nodes": [
+                {"name": "G1", "nodes": [{"name": "A"}]},
+                {"name": "G2", "nodes": [{"name": "A"}]},
+                {"name": "C"},
+            ],
+            "links": [{"from": "A", "to": "C"}],
+        }
+    )
+
+    with pytest.raises(ValueError, match="Ambiguous node 'A' referenced by edge"):
+        builder_mod.build_canvas(minimal, sample_settings())
+
+
 def test_build_canvas_falls_back_to_node_defaults_when_subgraph_defaults_missing():
     minimal = MinimalGraphIn.model_validate(
         {
