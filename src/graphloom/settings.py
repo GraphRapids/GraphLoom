@@ -123,6 +123,8 @@ def sample_settings() -> ElkSettings:
                     "org.eclipse.elk.portLabels.treatAsGroup": True,
                     "org.eclipse.elk.portLabels.placement": "[OUTSIDE,NEXT_TO_PORT_IF_POSSIBLE]",
                     "org.eclipse.elk.nodeLabels.placement": "[OUTSIDE, V_BOTTOM, H_CENTER, H_PRIORITY]",
+                    "org.eclipse.elk.spacing.labelPortHorizontal": 1,
+                    "org.eclipse.elk.spacing.labelPortVertical": -3.5,
                 },
             },
             "subgraph_defaults": {

@@ -1,0 +1,17 @@
+nodes:
+  - name: subgraph
+    nodes:
+      - name: A
+        type: switch
+      - name: B
+        type: router
+    links:
+      - from: A:eth0
+        to: B:eth1
+        label: "1000"
+  - name: C
+    type: switch
+links:
+  - from: A
+    to: C
+    label: foobar
