@@ -117,7 +117,7 @@ Precedence:
 
 - Node style: role defaults (`node_defaults` / `subgraph_defaults`) then `type_overrides`
 - Edge style: `edge_defaults` then `edge_type_overrides`
-- Edge label text: explicit `label`, then `edge_defaults.label.text`
+- Edge label text: explicit `label` only (no automatic fallback label)
 
 ## Troubleshooting
 

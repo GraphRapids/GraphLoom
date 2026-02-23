@@ -83,7 +83,7 @@ properties.org.eclipse.elk.edge.type = "UNDIRECTED"
 properties.org.eclipse.elk.edge.thickness = 1
 
 [edge_defaults.label]
-text = "Edge"
+text = ""
 width = 200
 height = 10
 properties.org.eclipse.elk.font.name = "Arial"

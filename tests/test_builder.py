@@ -56,7 +56,7 @@ def test_sample_build():
     assert canvas.edges[1].sources == ["node_3_eth0"]
     assert canvas.edges[1].targets == ["node_4_eth1"]
     assert canvas.edges[0].labels[0].text == "Uplink 1"
-    assert canvas.edges[1].labels[0].text == settings.edge_defaults.label.text
+    assert canvas.edges[1].labels == []
     assert canvas.edges[0].type == "MPLS"
     assert canvas.edges[1].type is None
 
@@ -221,7 +221,7 @@ def test_links_string_shorthand():
 
     assert canvas.edges[0].sources == ["a_eth0"]
     assert canvas.edges[0].targets == ["b_eth1"]
-    assert canvas.edges[0].labels[0].text == settings.edge_defaults.label.text
+    assert canvas.edges[0].labels == []
 
 
 def test_edge_id_derived_from_label():
@@ -244,15 +244,13 @@ def test_edge_type_overrides_apply_for_matching_type():
     settings = sample_settings()
     settings.estimate_label_size_from_font = False
     override = settings.edge_defaults.model_copy(deep=True)
-    override.label.text = "100G default label"
     override.label.width = 222
     override.properties["org.eclipse.elk.edge.thickness"] = 7
     settings.edge_type_overrides["100g"] = override
 
     canvas = build_canvas(minimal, settings)
 
-    assert canvas.edges[0].labels[0].text == "100G default label"
-    assert canvas.edges[0].labels[0].width == 222
+    assert canvas.edges[0].labels == []
     assert canvas.edges[0].properties.model_dump()["org.eclipse.elk.edge.thickness"] == 7
     assert canvas.edges[0].type == "100G"
 

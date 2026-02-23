@@ -150,12 +150,12 @@ def sample_settings() -> ElkSettings:
                     "org.eclipse.elk.nodeLabels.placement": "[INSIDE, V_TOP, H_CENTER]",
                 },
             },
-            "edge_defaults": {
-                "label": {
-                    "text": "Edge",
-                    "width": 200,
-                    "height": 10,
-                    "properties": {
+                "edge_defaults": {
+                    "label": {
+                        "text": "",
+                        "width": 200,
+                        "height": 10,
+                        "properties": {
                         "org.eclipse.elk.font.name": "Arial",
                         "org.eclipse.elk.font.size": 10,
                         "org.eclipse.elk.edgeLabels.inline": True,

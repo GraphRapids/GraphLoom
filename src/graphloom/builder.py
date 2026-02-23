@@ -543,31 +543,34 @@ def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> C
 
             edge_type_norm = (edge.type or "").strip().lower()
             edge_defaults = edge_type_overrides_lc.get(edge_type_norm) or settings.edge_defaults
-            edge_label_text = edge.label or edge_defaults.label.text
-            edge_label_properties = _merge_properties(
-                Properties(**edge_defaults.label.properties),
-                {},
-            )
-            edge_label_width, edge_label_height = _estimate_label_dimensions(
-                text=edge_label_text,
-                width=edge_defaults.label.width,
-                height=edge_defaults.label.height,
-                properties=edge_label_properties,
-                settings=settings,
-            )
-            edge_label = EdgeLabel(
-                text=edge_label_text,
-                width=edge_label_width,
-                height=edge_label_height,
-                properties=edge_label_properties,
-            )
+            edge_labels: List[EdgeLabel] = []
+            if edge.label is not None:
+                edge_label_properties = _merge_properties(
+                    Properties(**edge_defaults.label.properties),
+                    {},
+                )
+                edge_label_width, edge_label_height = _estimate_label_dimensions(
+                    text=edge.label,
+                    width=edge_defaults.label.width,
+                    height=edge_defaults.label.height,
+                    properties=edge_label_properties,
+                    settings=settings,
+                )
+                edge_labels.append(
+                    EdgeLabel(
+                        text=edge.label,
+                        width=edge_label_width,
+                        height=edge_label_height,
+                        properties=edge_label_properties,
+                    )
+                )
             scope_edges.append(
                 Edge(
                     id=edge_id,
                     type=edge.type,
                     sources=sources,
                     targets=targets,
-                    labels=[edge_label],
+                    labels=edge_labels,
                     properties=_merge_properties(
                         Properties(**edge_defaults.properties),
                         {},
