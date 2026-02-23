@@ -381,6 +381,7 @@ def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> C
     settings = settings or sample_settings()
     parent_layout = _canvas_layout_options(settings.layout_options)
     global_alias_candidates = _collect_alias_candidates(data)
+    cross_scope_ports: Dict[str, OrderedDict[str, Dict[str, str]]] = {}
 
     type_overrides_lc = {k.lower(): v for k, v in settings.type_overrides.items()}
     type_icon_map_lc = {k.lower(): v for k, v in settings.type_icon_map.items()}
@@ -390,6 +391,22 @@ def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> C
         nodes: "OrderedDict[str, _NodeRecord]" = OrderedDict()
         alias_index: Dict[str, str] = {}
         ports: Dict[str, OrderedDict[str, Dict[str, str]]] = {}
+
+        def ensure_port(
+            port_store: Dict[str, OrderedDict[str, Dict[str, str]]],
+            *,
+            node_id: str,
+            port_name: str,
+        ) -> str:
+            port_key = sanitize_id(port_name)
+            if node_id not in port_store:
+                port_store[node_id] = OrderedDict()
+            if port_key not in port_store[node_id]:
+                port_store[node_id][port_key] = {
+                    "label": port_name,
+                    "id": f"{node_id}_{port_key}",
+                }
+            return port_store[node_id][port_key]["id"]
 
         def register_node(
             label: str,
@@ -462,18 +479,8 @@ def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> C
                 node_rec, is_local_node = ensure_node(node_part)
                 if port_part is None:
                     continue
-                if not is_local_node:
-                    raise ValueError(
-                        f"Cannot reference port '{port_part}' on out-of-scope node '{node_part}'"
-                    )
-                port_key = sanitize_id(port_part)
-                if node_rec.id not in ports:
-                    ports[node_rec.id] = OrderedDict()
-                if port_key not in ports[node_rec.id]:
-                    ports[node_rec.id][port_key] = {
-                        "label": port_part,
-                        "id": f"{node_rec.id}_{port_key}",
-                    }
+                port_store = ports if is_local_node else cross_scope_ports
+                ensure_port(port_store, node_id=node_rec.id, port_name=port_part)
 
         def build_node(node_rec: _NodeRecord) -> Node:
             child_nodes: List[Node] = []
@@ -495,7 +502,12 @@ def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> C
             icon = type_icon_map_lc.get(effective_type, defaults.icon)
 
             node_ports: List[Port] = []
-            for port_data in ports.get(node_rec.id, OrderedDict()).values():
+            merged_port_map: "OrderedDict[str, Dict[str, str]]" = OrderedDict()
+            for port_key, port_data in ports.get(node_rec.id, OrderedDict()).items():
+                merged_port_map[port_key] = port_data
+            for port_key, port_data in cross_scope_ports.get(node_rec.id, OrderedDict()).items():
+                merged_port_map.setdefault(port_key, port_data)
+            for port_data in merged_port_map.values():
                 port_defaults = defaults.port
                 port_label_properties = _merge_properties(
                     Properties(**port_defaults.label.properties),
@@ -576,12 +588,8 @@ def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> C
                 if port_part is None:
                     bucket.append(node_rec.id)
                     continue
-                if not is_local_node:
-                    raise ValueError(
-                        f"Cannot reference port '{port_part}' on out-of-scope node '{node_part}'"
-                    )
-                port_key = sanitize_id(port_part)
-                port_id = ports[node_rec.id][port_key]["id"]
+                port_store = ports if is_local_node else cross_scope_ports
+                port_id = ensure_port(port_store, node_id=node_rec.id, port_name=port_part)
                 bucket.append(port_id)
 
             edge_id_source = edge.id or edge.label or _gen_id("edge")

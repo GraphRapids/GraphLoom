@@ -227,6 +227,32 @@ def test_build_canvas_resolves_root_edge_to_unique_nested_node_without_autocreat
     assert canvas.edges[0].targets == ["c"]
 
 
+def test_build_canvas_autocreates_port_on_nested_node_for_cross_scope_edge():
+    minimal = MinimalGraphIn.model_validate(
+        {
+            "nodes": [
+                {
+                    "name": "subgraph",
+                    "nodes": [
+                        {"name": "A", "type": "switch"},
+                        {"name": "B", "type": "router"},
+                    ],
+                    "links": [{"from": "A:eth0", "to": "B:eth1", "label": "1000"}],
+                },
+                {"name": "C", "type": "switch"},
+            ],
+            "links": [{"from": "A:eth4", "to": "C:eth0", "label": "foobar"}],
+        }
+    )
+
+    canvas = builder_mod.build_canvas(minimal, sample_settings())
+
+    assert canvas.edges[0].sources == ["a_eth4"]
+    assert canvas.edges[0].targets == ["c_eth0"]
+    nested_a = canvas.children[0].children[0]
+    assert sorted(port.id for port in nested_a.ports) == ["a_eth0", "a_eth4"]
+
+
 def test_build_canvas_rejects_ambiguous_cross_scope_node_reference():
     minimal = MinimalGraphIn.model_validate(
         {
