@@ -15,6 +15,26 @@ Use this file as a running log between work sessions.
 ## Current
 
 ### 2026-02-26
+- Summary: Removed external theme package dependency and dropped compatibility theme selector flags.
+- Changes:
+  - Removed compatibility theme selector handling from CLI/runtime path.
+  - Kept profile-driven `elkSettings` as the single runtime style mechanism.
+  - Updated CLI regression coverage for profile-first behavior.
+  - Removed optional theme package dependency from `pyproject.toml`.
+- Files touched:
+  - `src/graphloom/theme.py`
+  - `src/graphloom/builder.py`
+  - `tests/test_theme.py`
+  - `pyproject.toml`
+  - `PROJECT_CONTEXT.md`
+  - `SESSION_NOTES.md`
+- Tests run:
+  - Pending.
+- Known issues: none.
+- Next steps:
+  - Keep `theme.py` limited to pure metric mapping helpers for migration use-cases only.
+
+### 2026-02-26
 - Summary: Added GraphAPI profile bundle adapter for deterministic `elkSettings` consumption.
 - Changes:
   - Added `src/graphloom/profile.py` with:

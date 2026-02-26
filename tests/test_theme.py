@@ -45,19 +45,9 @@ def test_apply_theme_metrics_supports_per_label_font_sizes() -> None:
     assert themed.edge_defaults.label.properties["org.eclipse.elk.font.size"] == 10.0
 
 
-def test_main_applies_theme_id_before_build(monkeypatch, tmp_path) -> None:
+def test_main_builds_with_default_settings_path(tmp_path) -> None:
     input_path = tmp_path / "input.json"
     input_path.write_text('{"nodes":["A"],"links":[]}', encoding="utf-8")
 
-    captured: dict[str, object] = {}
-
-    def fake_resolve(settings, theme_id):
-        captured["theme_id"] = theme_id
-        return settings
-
-    monkeypatch.setattr(builder_mod, "resolve_theme_settings", fake_resolve)
-
-    exit_code = builder_mod.main([str(input_path), "--theme-id", "default"])
-
+    exit_code = builder_mod.main([str(input_path)])
     assert exit_code == 0
-    assert captured["theme_id"] == "default"

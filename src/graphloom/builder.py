@@ -27,7 +27,6 @@ from .elkjs import layout_with_elkjs
 from .node import Node, NodeLabel
 from .port import Port, PortLabel
 from .settings import ElkSettings, sample_settings
-from .theme import resolve_theme_settings
 
 NODE_NAME_MIN_LENGTH = 1
 NODE_NAME_MAX_LENGTH = 20
@@ -724,10 +723,6 @@ def main(argv: List[str] | None = None) -> int:
     )
     parser.add_argument("-s", "--settings", help="Path to settings TOML/JSON (optional)")
     parser.add_argument(
-        "--theme-id",
-        help="Theme id from GraphTheme used to apply ELK layout metrics.",
-    )
-    parser.add_argument(
         "--layout",
         action="store_true",
         help="Run local elkjs layout and include computed positions/sizes in output.",
@@ -747,7 +742,6 @@ def main(argv: List[str] | None = None) -> int:
 
     data = _load_input(args.input)
     settings = _load_settings(args.settings)
-    settings = resolve_theme_settings(settings, args.theme_id)
     canvas = build_canvas(data, settings)
     enriched_payload = canvas.model_dump(by_alias=True, exclude_none=True)
     if args.enriched_output:

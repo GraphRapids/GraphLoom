@@ -10,7 +10,7 @@ _EDGE_THICKNESS_KEY = "org.eclipse.elk.edge.thickness"
 
 
 def apply_theme_metrics(settings: ElkSettings, metrics: Mapping[str, Any]) -> ElkSettings:
-    """Apply GraphTheme metrics to ELK settings used by GraphLoom."""
+    """Apply metric overrides to ELK settings."""
     themed = settings.model_copy(deep=True)
 
     font_family = metrics.get("font_family")
@@ -56,20 +56,6 @@ def apply_theme_metrics(settings: ElkSettings, metrics: Mapping[str, Any]) -> El
             themed.edge_defaults.properties[_EDGE_THICKNESS_KEY] = parsed_edge_thickness
 
     return themed
-
-
-def resolve_theme_settings(settings: ElkSettings, theme_id: str | None) -> ElkSettings:
-    """Return settings with theme metrics applied when a theme id is provided."""
-    if not theme_id:
-        return settings
-    try:
-        from graphtheme import get_theme_metrics
-    except Exception as exc:
-        raise RuntimeError(
-            "GraphTheme integration requires the 'GraphTheme' package to be installed."
-        ) from exc
-    metrics = get_theme_metrics(theme_id)
-    return apply_theme_metrics(settings, metrics)
 
 
 def _set_font_family(settings: ElkSettings, font_family: str) -> None:

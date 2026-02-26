@@ -46,7 +46,7 @@ Primary settings groups:
 - Upstream authoring: GraphEditor / GraphYamlEditor.
 - Downstream render: GraphRender.
 - API exposure and orchestration: GraphAPI.
-- Theme metrics source: GraphTheme.
+- Profile-driven `elkSettings` is the canonical runtime style input.
 - Profile adapter module: `src/graphloom/profile.py`.
 
 ## Testing Expectations
