@@ -16,6 +16,7 @@ It is designed for topology authoring workflows where source input should stay c
 - Automatic node and port creation from edge endpoints
 - Type-to-icon mapping through settings
 - Settings-driven node, edge, label, and layout defaults
+- Profile bundle adapter for consuming GraphAPI `elkSettings`
 - Optional local `elkjs` layout execution from CLI or Python API
 
 ## Requirements
@@ -67,7 +68,13 @@ graphloom <input.json|input.yaml> [-s settings.toml|settings.json] [-o output.js
 ## Python API
 
 ```python
-from graphloom import MinimalGraphIn, build_canvas, layout_with_elkjs, sample_settings
+from graphloom import (
+    MinimalGraphIn,
+    build_canvas,
+    build_canvas_from_profile_bundle,
+    layout_with_elkjs,
+    sample_settings,
+)
 
 minimal = MinimalGraphIn.model_validate({
     "nodes": ["A", "B"],
@@ -79,7 +86,19 @@ payload = canvas.model_dump(by_alias=True, exclude_none=True)
 
 # Optional local layout
 laid_out = layout_with_elkjs(payload, mode="node")
+
+# Or resolve settings from a GraphAPI profile bundle
+profile_bundle = {"profileId": "runtime", "profileVersion": 3, "checksum": "abc", "elkSettings": sample_settings().model_dump(by_alias=True, exclude_none=True)}
+canvas, resolved = build_canvas_from_profile_bundle(minimal, profile_bundle)
 ```
+
+## Profile Bundle Adapter
+
+Use `resolve_profile_elk_settings()` / `build_canvas_from_profile_bundle()` to consume canonical GraphAPI profile bundles.
+
+- Validates `elkSettings` via `ElkSettings`
+- Preserves `profileId`, `profileVersion`, and `checksum`
+- Canonicalizes settings maps for deterministic downstream output
 
 ## Input Expectations
 

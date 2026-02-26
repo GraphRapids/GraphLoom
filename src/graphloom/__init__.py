@@ -27,6 +27,11 @@ from .options import (
 )
 from .port import Port, PortLabel
 from .edge import Edge,EdgeLabel
+from .profile import (
+    ResolvedProfileElkSettings,
+    build_canvas_from_profile_bundle,
+    resolve_profile_elk_settings,
+)
 from .settings import ElkSettings, sample_settings
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -66,6 +71,9 @@ __all__ = [
     "sanitize_id",
     "ElkSettings",
     "sample_settings",
+    "ResolvedProfileElkSettings",
+    "resolve_profile_elk_settings",
+    "build_canvas_from_profile_bundle",
 ]
 
 

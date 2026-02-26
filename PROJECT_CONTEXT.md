@@ -8,6 +8,7 @@ GraphLoom converts minimal graph JSON/YAML into enriched ELK JSON, applying defa
 - Apply schema/domain validation with clear errors.
 - Keep settings-driven defaults centralized and composable.
 - Support optional local layout execution for end-to-end pipelines.
+- Support canonical runtime settings ingestion from GraphAPI profile bundles.
 
 ## Package Snapshot
 - Python package: `graphloom`
@@ -26,6 +27,7 @@ Core inputs:
 Core outputs:
 - Enriched ELK-compatible JSON payload.
 - Optional laid-out ELK payload when `--layout` is enabled.
+- Resolved profile adapter output (`ResolvedProfileElkSettings`) for profile-driven pipelines.
 
 Behavior expectations:
 - Auto-create missing nodes/ports from link endpoints (subject to settings).
@@ -45,6 +47,7 @@ Primary settings groups:
 - Downstream render: GraphRender.
 - API exposure and orchestration: GraphAPI.
 - Theme metrics source: GraphTheme.
+- Profile adapter module: `src/graphloom/profile.py`.
 
 ## Testing Expectations
 - `python -m pytest -q`
