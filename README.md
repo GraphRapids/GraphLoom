@@ -16,7 +16,7 @@ It is designed for topology authoring workflows where source input should stay c
 - Automatic node and port creation from edge endpoints
 - Type-to-icon mapping through settings
 - Settings-driven node, edge, label, and layout defaults
-- Profile bundle adapter for consuming GraphAPI `elkSettings`
+- Profile-bundle adapter for consuming `elkSettings` payloads
 - Optional local `elkjs` layout execution from CLI or Python API
 
 ## Requirements
@@ -87,14 +87,19 @@ payload = canvas.model_dump(by_alias=True, exclude_none=True)
 # Optional local layout
 laid_out = layout_with_elkjs(payload, mode="node")
 
-# Or resolve settings from a GraphAPI profile bundle
+# Or resolve settings from a profile bundle
 profile_bundle = {"profileId": "runtime", "profileVersion": 3, "checksum": "abc", "elkSettings": sample_settings().model_dump(by_alias=True, exclude_none=True)}
 canvas, resolved = build_canvas_from_profile_bundle(minimal, profile_bundle)
 ```
 
 ## Profile Bundle Adapter
 
-Use `resolve_profile_elk_settings()` / `build_canvas_from_profile_bundle()` to consume canonical GraphAPI profile bundles.
+Use `resolve_profile_elk_settings()` / `build_canvas_from_profile_bundle()` to consume bundles shaped as:
+
+- `profileId`
+- `profileVersion`
+- `checksum`
+- `elkSettings`
 
 - Validates `elkSettings` via `ElkSettings`
 - Preserves `profileId`, `profileVersion`, and `checksum`
