@@ -110,13 +110,17 @@ Use `resolve_profile_elk_settings()` / `build_canvas_from_profile_bundle()` to c
 GraphLoom expects minimal graph authoring input:
 
 - `nodes[]`: string or object (`name`, `type`, `id`, nested `nodes`, nested `links`)
-- `links[]`: string shorthand or object (`id`, `label`, `type`, `from`, `to`)
+- `links[]`: string shorthand or object (`id`, `label`, `type`, `properties`, `from`, `to`)
 
 Validation rules:
 
 - Node name length: `1..20`, and must not contain `:`
 - Port name length in endpoints: `1..15`
 - Edge label length (when provided): `1..40`
+- `graphrapids.edge.marker_start` / `graphrapids.edge.marker_end` values must be one of:
+  `NONE`, `OPEN_ARROW`, `HOLLOW_ARROW`, `SOLID_ARROW`, `HOLLOW_DIAMOND`, `SOLID_DIAMOND`
+- `graphrapids.edge.style` must be one of:
+  `SOLID`, `DASH`, `DOT`, `DASH_DOT`, `LONG_DASH_DOT`
 - Graph must include at least one node or one link
 
 Bundled schema:
@@ -140,8 +144,10 @@ Settings can be loaded from TOML/JSON and control all defaults:
 Precedence:
 
 - Node style: role defaults (`node_defaults` / `subgraph_defaults`) then `type_overrides`
-- Edge style: `edge_defaults` then `edge_type_overrides`
+- Edge style: `edge_defaults` then `edge_type_overrides` then per-link `properties`
 - Edge label text: explicit `label` only (no automatic fallback label)
+- GraphRapids edge defaults are always materialized on output edges when missing:
+  `graphrapids.edge.marker_start=NONE`, `graphrapids.edge.marker_end=NONE`, `graphrapids.edge.style=SOLID`
 
 ## Troubleshooting
 

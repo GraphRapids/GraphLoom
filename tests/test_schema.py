@@ -43,7 +43,7 @@ def test_minimal_input_schema_rejects_alias_keys_for_nodes_and_edges():
     assert {"name", "type", "id", "nodes", "links"} <= node_keys
     assert not {"l", "t", "edges"}.intersection(node_keys)
 
-    assert {"label", "type", "id", "from", "to"} <= edge_keys
+    assert {"label", "type", "id", "properties", "from", "to"} <= edge_keys
     assert not {"name", "l", "t", "a", "b"}.intersection(edge_keys)
 
 
@@ -91,3 +91,12 @@ def test_minimal_input_schema_enforces_name_length_limits():
     assert to_endpoint["minLength"] == 1
     assert to_endpoint["maxLength"] == 36
     assert to_endpoint["pattern"] == endpoint_pattern
+
+
+def test_minimal_input_schema_supports_edge_properties_object():
+    schema = _load_schema()
+    edge_def = schema["$defs"]["MinimalEdgeIn"]
+    properties = edge_def["properties"]["properties"]
+
+    assert properties["type"] == "object"
+    assert properties["additionalProperties"] is True

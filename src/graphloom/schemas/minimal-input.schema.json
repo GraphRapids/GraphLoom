@@ -43,6 +43,12 @@
           "default": null,
           "title": "Type"
         },
+        "properties": {
+          "additionalProperties": true,
+          "default": {},
+          "title": "Properties",
+          "type": "object"
+        },
         "from": {
           "maxLength": 36,
           "minLength": 1,

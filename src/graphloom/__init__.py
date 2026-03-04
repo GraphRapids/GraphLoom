@@ -6,6 +6,8 @@ from .canvas import Canvas
 from .base import Properties
 from .enums import (
     Direction,
+    EdgeMarker,
+    EdgeStyle,
     LayeringStrategy,
     NodeLabelPlacement,
     NodeSizeConstraint,
@@ -54,6 +56,8 @@ __all__ = [
     "LabelLayoutOptions",
     "Properties",
     "Direction",
+    "EdgeMarker",
+    "EdgeStyle",
     "LayeringStrategy",
     "NodeLabelPlacement",
     "NodeSizeConstraint",

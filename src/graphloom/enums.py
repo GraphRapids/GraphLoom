@@ -122,6 +122,21 @@ class EdgeType(str, Enum):
     GENERALIZATION = "GENERALIZATION"
     DEPENDENCY = "DEPENDENCY"
 
+class EdgeMarker(str, Enum):
+    NONE = "NONE"
+    OPEN_ARROW = "OPEN_ARROW"
+    HOLLOW_ARROW = "HOLLOW_ARROW"
+    SOLID_ARROW = "SOLID_ARROW"
+    HOLLOW_DIAMOND = "HOLLOW_DIAMOND"
+    SOLID_DIAMOND = "SOLID_DIAMOND"
+
+class EdgeStyle(str, Enum):
+    SOLID = "SOLID"
+    DASH = "DASH"
+    DOT = "DOT"
+    DASH_DOT = "DASH_DOT"
+    LONG_DASH_DOT = "LONG_DASH_DOT"
+
 class FixedAlignment(str, Enum):
     NONE = "NONE"
     LEFTUP = "LEFTUP"

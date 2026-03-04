@@ -26,6 +26,8 @@ from .enums import (
     EdgeRoutingMode,
     EdgeRoutingStrategy,
     EdgeStraighteningStrategy,
+    EdgeMarker,
+    EdgeStyle,
     EdgeType,
     FixedAlignment,
     ForceModelStrategy,
@@ -485,6 +487,9 @@ class EdgeLayoutOptions(_LayoutOptionsBase):
     org_eclipse_elk_layered_priority_direction: Optional[int] = Field(default=None, alias="org.eclipse.elk.layered.priority.direction")
     org_eclipse_elk_edge_thickness: Optional[float] = Field(default=None, alias="org.eclipse.elk.edge.thickness")
     org_eclipse_elk_edge_type: Optional[EdgeType] = Field(default=None, alias="org.eclipse.elk.edge.type")
+    graphrapids_edge_marker_start: Optional[EdgeMarker] = Field(default=None, alias="graphrapids.edge.marker_start")
+    graphrapids_edge_marker_end: Optional[EdgeMarker] = Field(default=None, alias="graphrapids.edge.marker_end")
+    graphrapids_edge_style: Optional[EdgeStyle] = Field(default=None, alias="graphrapids.edge.style")
     org_eclipse_elk_layered_considerModelOrder_groupModelOrder_componentGroupId: Optional[int] = Field(default=None, alias="org.eclipse.elk.layered.considerModelOrder.groupModelOrder.componentGroupId")
     org_eclipse_elk_layered_considerModelOrder_groupModelOrder_crossingMinimizationId: Optional[int] = Field(default=None, alias="org.eclipse.elk.layered.considerModelOrder.groupModelOrder.crossingMinimizationId")
     org_eclipse_elk_spacing_individual: Optional[Any] = Field(default=None, alias="org.eclipse.elk.spacing.individual")

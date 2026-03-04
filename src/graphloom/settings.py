@@ -3,6 +3,7 @@ from typing import Any, Dict, Optional
 from pydantic import BaseModel, Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from .edge_properties import normalize_graphrapids_edge_properties
 
 class LabelDefaults(BaseModel):
     text: str
@@ -41,6 +42,14 @@ class SubgraphDefaults(BaseModel):
 class EdgeDefaults(BaseModel):
     label: LabelDefaults
     properties: Dict[str, Any] = Field(default_factory=dict)
+
+    @model_validator(mode="after")
+    def validate_and_apply_graphrapids_edge_defaults(self) -> "EdgeDefaults":
+        self.properties = normalize_graphrapids_edge_properties(
+            self.properties,
+            apply_defaults=True,
+        )
+        return self
 
 
 class ElkSettings(BaseSettings):
@@ -168,6 +177,9 @@ def sample_settings() -> ElkSettings:
                 "properties": {
                     "org.eclipse.elk.edge.type": "UNDIRECTED",
                     "org.eclipse.elk.edge.thickness": 1,
+                    "graphrapids.edge.marker_start": "NONE",
+                    "graphrapids.edge.marker_end": "NONE",
+                    "graphrapids.edge.style": "SOLID",
                 },
             },
             "type_icon_map": {

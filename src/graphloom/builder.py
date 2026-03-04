@@ -22,6 +22,7 @@ from .options import (
     PortLayoutOptions,
 )
 from .base import Properties, _gen_id
+from .edge_properties import normalize_graphrapids_edge_properties
 from .edge import Edge, EdgeLabel
 from .elkjs import layout_with_elkjs
 from .node import Node, NodeLabel
@@ -102,6 +103,7 @@ class MinimalEdgeIn(BaseModel):
     id: str | None = None
     label: str | None = None
     type: str | None = None
+    properties: Dict[str, Any] = Field(default_factory=dict)
     source: str = Field(
         validation_alias="from",
         serialization_alias="from",
@@ -145,6 +147,14 @@ class MinimalEdgeIn(BaseModel):
                 max_len=PORT_NAME_MAX_LENGTH,
             )
         return value
+
+    @model_validator(mode="after")
+    def validate_custom_edge_properties(self) -> "MinimalEdgeIn":
+        self.properties = normalize_graphrapids_edge_properties(
+            self.properties,
+            apply_defaults=False,
+        )
+        return self
 
 
 class MinimalGraphIn(BaseModel):
@@ -630,9 +640,14 @@ def build_canvas(data: MinimalGraphIn, settings: ElkSettings | None = None) -> C
                     sources=sources,
                     targets=targets,
                     labels=edge_labels,
-                    properties=_merge_properties(
-                        Properties(**edge_defaults.properties),
-                        {},
+                    properties=Properties(
+                        **normalize_graphrapids_edge_properties(
+                            _merge_properties(
+                                Properties(**edge.properties),
+                                edge_defaults.properties,
+                            ).model_dump(),
+                            apply_defaults=True,
+                        )
                     ),
                 )
             )

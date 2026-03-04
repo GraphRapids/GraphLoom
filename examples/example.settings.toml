@@ -81,6 +81,9 @@ properties.org.eclipse.elk.font.size = 4
 [edge_defaults]
 properties.org.eclipse.elk.edge.type = "UNDIRECTED"
 properties.org.eclipse.elk.edge.thickness = 1
+properties.graphrapids.edge.marker_start = "NONE"
+properties.graphrapids.edge.marker_end = "NONE"
+properties.graphrapids.edge.style = "SOLID"
 
 [edge_defaults.label]
 text = ""

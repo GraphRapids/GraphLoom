@@ -255,6 +255,87 @@ def test_edge_type_overrides_apply_for_matching_type():
     assert canvas.edges[0].type == "100G"
 
 
+def test_graphrapids_edge_properties_default_when_not_set():
+    minimal = MinimalGraphIn(
+        nodes=["A", "B"],
+        links=[{"from": "A", "to": "B"}],
+    )
+    settings = sample_settings()
+
+    canvas = build_canvas(minimal, settings)
+    edge_properties = canvas.edges[0].properties.model_dump()
+
+    assert edge_properties["graphrapids.edge.marker_start"] == "NONE"
+    assert edge_properties["graphrapids.edge.marker_end"] == "NONE"
+    assert edge_properties["graphrapids.edge.style"] == "SOLID"
+
+
+def test_graphrapids_edge_properties_validate_when_set():
+    minimal = MinimalGraphIn(
+        nodes=["A", "B"],
+        links=[
+            {
+                "from": "A",
+                "to": "B",
+                "properties": {
+                    "graphrapids.edge.marker_start": "OPEN_ARROW",
+                    "graphrapids.edge.marker_end": "SOLID_DIAMOND",
+                    "graphrapids.edge.style": "DASH_DOT",
+                },
+            }
+        ],
+    )
+    settings = sample_settings()
+
+    canvas = build_canvas(minimal, settings)
+    edge_properties = canvas.edges[0].properties.model_dump()
+
+    assert edge_properties["graphrapids.edge.marker_start"] == "OPEN_ARROW"
+    assert edge_properties["graphrapids.edge.marker_end"] == "SOLID_DIAMOND"
+    assert edge_properties["graphrapids.edge.style"] == "DASH_DOT"
+
+
+def test_graphrapids_edge_properties_reject_invalid_value():
+    with pytest.raises(ValidationError, match="graphrapids.edge.style"):
+        MinimalGraphIn.model_validate(
+            {
+                "nodes": ["A", "B"],
+                "links": [
+                    {
+                        "from": "A",
+                        "to": "B",
+                        "properties": {
+                            "graphrapids.edge.style": "ZIGZAG",
+                        },
+                    }
+                ],
+            }
+        )
+
+
+def test_graphrapids_edge_properties_per_link_override_type_override_defaults():
+    minimal = MinimalGraphIn(
+        nodes=["A", "B"],
+        links=[
+            {
+                "type": "100G",
+                "from": "A",
+                "to": "B",
+                "properties": {"graphrapids.edge.style": "LONG_DASH_DOT"},
+            }
+        ],
+    )
+    settings = sample_settings()
+    override = settings.edge_defaults.model_copy(deep=True)
+    override.properties["graphrapids.edge.style"] = "DOT"
+    settings.edge_type_overrides["100g"] = override
+
+    canvas = build_canvas(minimal, settings)
+    edge_properties = canvas.edges[0].properties.model_dump()
+
+    assert edge_properties["graphrapids.edge.style"] == "LONG_DASH_DOT"
+
+
 def test_role_defaults_apply_separately_for_subgraph_and_leaf_nodes():
     minimal = MinimalGraphIn(
         nodes=[

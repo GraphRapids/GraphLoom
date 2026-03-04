@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import pytest
+from pydantic import ValidationError
 
 from graphloom import MinimalGraphIn, sample_settings
 from graphloom.profile import build_canvas_from_profile_bundle, resolve_profile_elk_settings
@@ -88,3 +89,12 @@ def test_resolve_profile_elk_settings_rejects_invalid_payloads() -> None:
                 "elkSettings": [],
             }
         )
+
+
+def test_resolve_profile_elk_settings_rejects_invalid_graphrapids_edge_property_value() -> None:
+    settings_payload = sample_settings().model_dump(by_alias=True, exclude_none=True, mode="json")
+    settings_payload["edge_defaults"]["properties"]["graphrapids.edge.style"] = "INVALID_STYLE"
+    bundle = _bundle_with_settings(settings_payload)
+
+    with pytest.raises(ValidationError, match="graphrapids.edge.style"):
+        resolve_profile_elk_settings(bundle)

@@ -20,3 +20,8 @@ def test_lazy_elkjs_export_is_available_via_module_getattr():
 def test_unknown_graphloom_attribute_raises_attribute_error():
     with pytest.raises(AttributeError, match="module 'graphloom' has no attribute 'not_real'"):
         getattr(graphloom, "not_real")
+
+
+def test_graphrapids_edge_enums_are_exported():
+    assert graphloom.EdgeMarker.NONE.value == "NONE"
+    assert graphloom.EdgeStyle.SOLID.value == "SOLID"
