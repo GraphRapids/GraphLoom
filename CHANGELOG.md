@@ -7,6 +7,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
+
+### Added
+- PEP 257-compliant docstrings to `src/graphloom/canvas.py`: module-level, `Canvas` class-level, and validator method-level (`children_ids_unique`, `edge_ids_unique`) docstrings with Args, Returns, and Raises sections. Return type annotations added to both validator methods. (PR #8, closes #7)
+
+
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+
+## [Unreleased]
 ### Added
 - Docstring to `_gen_id(prefix)` helper in `src/graphloom/base.py` describing its purpose, parameter, and return value (#5).
 
