@@ -1,5 +1,16 @@
 # Changelog
 
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+
+## [Unreleased]
+### Added
+- Docstring to `_gen_id(prefix)` helper in `src/graphloom/base.py` describing its purpose, parameter, and return value (#5).
+
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
